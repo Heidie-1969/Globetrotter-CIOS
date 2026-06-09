@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Globetrotter CIOS IBPV Quiz App</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet GIS Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- Style Sheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==================== START SCREEN ==================== -->
+  <div id="start-screen" class="screen active">
+    <div class="card glass start-card">
+      <div class="logo-container">
+        <img src="logo.png" alt="CIOS Zuidwest-NL Logo" class="cios-logo">
+      </div>
+      <h1 class="glow-text">Globetrotter CIOS</h1>
+      <h2 class="sub-glow">Buitenlandse Stage Quiz App</h2>
+      <p class="description">
+        Bereid je voor op jouw internationale BPV-avontuur! Reis over de 5 werelddelen, test je kennis over de lokale (sport)culturen en behaal je Globetrotter-certificaat.
+      </p>
+
+      <div class="input-group">
+        <label for="student-name">Naam Student:</label>
+        <input type="text" id="student-name" placeholder="Vul je naam in..." autocomplete="off">
+      </div>
+
+      <div class="avatar-selector">
+        <p class="label">Kies je Sport-Avatar:</p>
+        <div class="avatar-grid">
+          <div class="avatar-option active" data-avatar="🏃">
+            <span class="emoji">🏃</span>
+            <span class="title">Runner</span>
+          </div>
+          <div class="avatar-option" data-avatar="🏊">
+            <span class="emoji">🏊</span>
+            <span class="title">Swimmer</span>
+          </div>
+          <div class="avatar-option" data-avatar="🚴">
+            <span class="emoji">🚴</span>
+            <span class="title">Cyclist</span>
+          </div>
+          <div class="avatar-option" data-avatar="⚽">
+            <span class="emoji">⚽</span>
+            <span class="title">Footballer</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="start-btn" class="btn primary-btn btn-glowing">
+        <i class="fa-solid fa-plane-departure"></i> Reis Beginnen
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN GAME SCREEN ==================== -->
+  <div id="game-screen" class="screen">
+    <!-- Header -->
+    <header class="glass header-bar">
+      <div class="header-left">
+        <img src="logo.png" alt="CIOS Logo" class="cios-header-logo">
+        <span class="divider"></span>
+        <h1 class="header-title">Globetrotter IBPV</h1>
+      </div>
+      <div class="header-right">
+        <div class="student-info">
+          <span id="player-avatar-badge" class="badge-emoji">🏃</span>
+          <span id="player-name-badge" class="badge-name">Student</span>
+        </div>
+        <button id="audio-toggle" class="btn icon-btn" title="Geluid Aan/Uit">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- Sidebar / Controls -->
+      <aside class="sidebar glass">
+        <div class="sidebar-section">
+          <h3>Jouw Voortgang</h3>
+          <div class="progress-container">
+            <div class="progress-bar-outer">
+              <div id="progress-fill" style="width: 0%;"></div>
+            </div>
+            <span id="progress-text">0 / 5 continenten bezocht</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Score</h3>
+          <div class="score-display">
+            <i class="fa-solid fa-trophy"></i>
+            <span id="total-score">0</span> <span class="pts">punten</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section scroll-section">
+          <h3>Bezochte Landen</h3>
+          <ul id="visited-countries-list" class="country-list">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+
+        <div class="sidebar-footer">
+          <p class="instruction-tip">
+            <i class="fa-solid fa-circle-info"></i> Klik op een oplichtend land op de wereldkaart om de quiz te starten.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Map Area -->
+      <main class="map-area glass">
+        <div id="map"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== QUIZ OVERLAY MODAL ==================== -->
+  <div id="quiz-modal" class="modal-overlay">
+    <div class="card glass modal-card">
+      <div class="modal-header">
+        <h2 id="modal-country-title">Spanje</h2>
+        <span class="badge-continent" id="modal-continent-title">Europa</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="quiz-progress">
+          Vraag <span id="current-question-num">1</span> van 5
+          <div class="progress-bar-outer mini-bar">
+            <div id="mini-progress-fill" style="width: 20%;"></div>
+          </div>
+        </div>
+
+        <h3 id="question-text" class="question-title">Hier komt de vraag te staan?</h3>
+
+        <div class="options-container" id="options-box">
+          <!-- Dynamically populated options -->
+        </div>
+
+        <div id="explanation-box" class="explanation-box hidden">
+          <h4><i class="fa-solid fa-circle-check"></i> Toelichting:</h4>
+          <p id="explanation-text">Hier komt de toelichting waarom het antwoord correct is.</p>
+          <button id="next-question-btn" class="btn primary-btn">Volgende Vraag</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== GAME OVER SCREEN ==================== -->
+  <div id="game-over-screen" class="screen">
+    <div class="card glass start-card result-card">
+      <div class="logo-container">
+        <img src="logo.png" alt="CIOS Zuidwest-NL Logo" class="cios-logo">
+      </div>
+      <h1 class="glow-text">Gefeliciteerd, Globetrotter!</h1>
+      <h2 class="sub-glow" id="result-name">Student</h2>
+      <p class="description">
+        Je hebt de 5 werelddelen succesvol bereisd en alle interculturele tests afgerond. Je bent nu officieel voorbereid op jouw buitenlandse stage!
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-card glass">
+          <span class="stat-label">Totale Score</span>
+          <span class="stat-value" id="final-score">100</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-label">Landen Bezocht</span>
+          <span class="stat-value" id="final-visited">5</span>
+        </div>
+      </div>
+
+      <div class="certificate-badge">
+        <i class="fa-solid fa-award"></i>
+        <span>CIOS IBPV Gecertificeerd</span>
+      </div>
+
+      <button id="restart-btn" class="btn primary-btn btn-glowing">
+        <i class="fa-solid fa-rotate-left"></i> Opnieuw Spelen
+      </button>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas Container -->
+  <div id="confetti-container"></div>
+
+  <!-- Leaflet GIS Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- App Files -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
