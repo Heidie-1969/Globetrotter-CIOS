@@ -585,6 +585,7 @@
     </div>
   </header>
 
+  <audio id="mario-kart-bgm" loop preload="auto" src="https://ia800108.us.archive.org/27/items/mario-kart-64-original-sound-track/03%20Raceways.mp3"></audio>
   <canvas id="confetti-canvas"></canvas>
 
   <div class="container">
@@ -692,10 +693,7 @@
           Vul je naam in, kies je Mario Kart avatar en race live mee tegen je klasgenoten!
         </p>
 
-        <div class="form-group">
-          <label for="player-pin-input">Game PIN (vraag aan docent):</label>
-          <input type="text" id="player-pin-input" class="form-input" value="CIOS-2627" placeholder="bijv. CIOS-2627">
-        </div>
+        <input type="hidden" id="player-pin-input" value="CIOS-2627">
 
         <div class="form-group">
           <label for="player-name-input">Jouw Naam / Duo Naam:</label>
@@ -808,25 +806,38 @@
           </div>
         </div>
 
-        <!-- Player Item Button -->
-        <div class="player-item-trigger" id="player-item-btn">
-          <span style="font-size:2rem;" id="player-item-emoji">&#x2753;</span>
-          <span id="player-item-text">Geen Mario Kart Item (beantwoord snel goed!)</span>
+        <!-- Mario Kart Special Item Trigger Box for Student -->
+        <div class="player-item-trigger" id="player-item-btn" style="cursor:pointer; background:linear-gradient(135deg, #1e293b, #0f172a); border:2px dashed rgba(255,255,255,0.25); border-radius:14px; padding:12px; display:flex; align-items:center; justify-content:center; gap:12px; transition:all 0.25s;">
+          <span style="font-size:2.2rem; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));" id="player-item-emoji">&#x2753;</span>
+          <div style="text-align:left;">
+            <div style="font-family:var(--font-arcade); font-size:0.85rem; color:var(--gold); letter-spacing:0.5px;" id="player-item-header">SPECIALE ITEM BOX</div>
+            <span id="player-item-text" style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Beantwoord vragen snel goed om items te winnen!</span>
+          </div>
         </div>
 
         <!-- Question View for Student -->
-        <div class="question-card-live" style="margin-top:4px;">
+        <div class="question-card-live" style="margin-top:8px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-            <span style="font-size:0.8rem; font-weight:bold; color:var(--cyan);" id="player-q-country">Spanje</span>
-            <span style="font-family:var(--font-arcade); font-size:0.9rem; color:var(--gold);" id="player-timer-text">25s</span>
+            <span style="font-size:0.85rem; font-weight:bold; color:var(--cyan);" id="player-q-country">Spanje</span>
+            <span style="font-family:var(--font-arcade); font-size:0.95rem; color:var(--gold);" id="player-timer-text">25s</span>
           </div>
 
           <div style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:14px;" id="player-q-prompt">
-            Vraag verschijnt hier...
+            Vraag verschijnt hier zodra de Grand Prix start...
           </div>
 
           <div class="options-live-grid" id="player-options-grid">
             <!-- Big Tap Buttons A, B, C for Student -->
+          </div>
+
+          <!-- Student Pitstop Jokers -->
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button id="player-joker-5050" class="secondary-btn" style="flex:1; padding:9px 6px; font-size:0.75rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; cursor:pointer;">
+              <i class="fa-solid fa-wand-magic-sparkles text-warning"></i> 50/50 Joker
+            </button>
+            <button id="player-joker-time" class="secondary-btn" style="flex:1; padding:9px 6px; font-size:0.75rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; cursor:pointer;">
+              <i class="fa-solid fa-stopwatch text-cyan"></i> +20s Joker
+            </button>
           </div>
         </div>
 
@@ -2059,6 +2070,79 @@ const QUESTIONS = {
     }
 
     // ==========================================
+    // MARIO KART RACE SOUNDTRACK (BGM)
+    // ==========================================
+    let bgmInterval = null;
+    let bgmStep = 0;
+
+    function startRaceBGM() {
+      if (!soundEnabled) return;
+      initAudio();
+      stopRaceBGM();
+
+      const audioEl = document.getElementById('mario-kart-bgm');
+      if (audioEl) {
+        audioEl.volume = 0.4;
+        const playPromise = audioEl.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            return;
+          }).catch(() => {
+            startChiptuneBGM();
+          });
+          return;
+        }
+      }
+      startChiptuneBGM();
+    }
+
+    function startChiptuneBGM() {
+      if (bgmInterval) clearInterval(bgmInterval);
+      bgmStep = 0;
+
+      const melodyNotes = [
+        392, 0, 392, 0, 494, 0, 587, 0,
+        659, 0, 587, 0, 494, 0, 392, 0,
+        440, 0, 440, 0, 523, 0, 659, 0,
+        587, 0, 523, 0, 440, 0, 392, 0,
+        523, 587, 659, 698, 784, 0, 659, 0,
+        587, 0, 494, 0, 392, 0, 440, 0,
+        494, 0, 523, 0, 587, 0, 659, 0,
+        784, 0, 784, 880, 784, 0, 0, 0
+      ];
+
+      const bassNotes = [
+        196, 196, 294, 196, 262, 262, 196, 294,
+        220, 220, 330, 220, 294, 294, 220, 196,
+        262, 262, 330, 262, 392, 392, 262, 330,
+        294, 294, 370, 294, 392, 196, 294, 392
+      ];
+
+      const stepMs = 120;
+      bgmInterval = setInterval(() => {
+        if (!soundEnabled) return;
+        const m = melodyNotes[bgmStep % melodyNotes.length];
+        const b = bassNotes[bgmStep % bassNotes.length];
+
+        if (m > 0) playTone(m, 'square', 0.08, 0.07);
+        if (b > 0 && bgmStep % 2 === 0) playTone(b, 'triangle', 0.13, 0.12);
+        if (bgmStep % 2 === 0) playTone(2400, 'sine', 0.02, 0.025);
+        bgmStep++;
+      }, stepMs);
+    }
+
+    function stopRaceBGM() {
+      if (bgmInterval) {
+        clearInterval(bgmInterval);
+        bgmInterval = null;
+      }
+      const audioEl = document.getElementById('mario-kart-bgm');
+      if (audioEl) {
+        try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) {}
+      }
+    }
+
+    // ==========================================
     // QUESTIONS DATA MANAGEMENT
     // ==========================================
     let gameQuestions = null;
@@ -2372,23 +2456,41 @@ const QUESTIONS = {
     // ==========================================
     function switchRole(role) {
       State.role = role;
-      document.getElementById('role-host-btn').classList.toggle('active', role === 'host');
-      document.getElementById('role-player-btn').classList.toggle('active', role === 'player');
+      const roleBar = document.getElementById('role-selector-bar');
+      const teacherButtons = document.querySelectorAll('#editor-open-btn, #fullscreen-btn, #restart-game-btn, #audio-toggle-btn');
 
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      if (role === 'player') {
+        if (roleBar) roleBar.style.display = 'none';
+        teacherButtons.forEach(btn => btn.style.display = 'none');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-      if (role === 'host') {
-        document.getElementById('host-lobby-screen').classList.add('active');
+        if (State.myPlayerInfo) {
+          document.getElementById('player-race-screen').classList.add('active');
+        } else {
+          document.getElementById('player-lobby-screen').classList.add('active');
+        }
         initRealtimeRoom();
-        // Periodically broadcast ping to discover connecting students
-        setInterval(() => {
-          if (State.role === 'host' && document.getElementById('host-lobby-screen').classList.contains('active')) {
-            broadcastEvent('host-ping', { pin: State.gamePin });
-          }
-        }, 2500);
       } else {
-        document.getElementById('player-lobby-screen').classList.add('active');
+        if (roleBar) roleBar.style.display = 'flex';
+        teacherButtons.forEach(btn => btn.style.display = 'inline-flex');
+        document.getElementById('role-host-btn').classList.add('active');
+        document.getElementById('role-player-btn').classList.remove('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+        if (State.currentQuestion) {
+          document.getElementById('host-race-screen').classList.add('active');
+        } else {
+          document.getElementById('host-lobby-screen').classList.add('active');
+        }
         initRealtimeRoom();
+
+        if (!State.hostPingInterval) {
+          State.hostPingInterval = setInterval(() => {
+            if (State.role === 'host' && document.getElementById('host-lobby-screen').classList.contains('active')) {
+              broadcastEvent('host-ping', { pin: State.gamePin });
+            }
+          }, 2500);
+        }
       }
     }
 
@@ -2469,6 +2571,7 @@ const QUESTIONS = {
 
       initTrackCanvas();
       playSound('go');
+      startRaceBGM();
 
       broadcastEvent('game-start', {
         circuit: State.circuit,
@@ -2744,18 +2847,30 @@ const QUESTIONS = {
         const itemBtn = document.getElementById('player-item-btn');
         if (me.item) {
           document.getElementById('player-item-emoji').innerText = me.item.emoji;
-          document.getElementById('player-item-text').innerText = `${me.item.name} (TIK OM IN TE ZETTEN!)`;
-          itemBtn.style.borderColor = 'var(--accent)';
+          const hdr = document.getElementById('player-item-header');
+          if (hdr) hdr.innerText = `${me.item.name.toUpperCase()} KLAAR!`;
+          document.getElementById('player-item-text').innerText = 'ðŸ”¥ TIK HIER OM IN TE ZETTEN!';
+          itemBtn.style.background = 'linear-gradient(135deg, #f59e0b, #ef4444)';
+          itemBtn.style.borderColor = '#fef08a';
+          itemBtn.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.7)';
           itemBtn.onclick = () => {
             broadcastEvent('item-deploy', { playerId: State.myPlayerId, itemId: me.item.id });
             document.getElementById('player-item-emoji').innerText = '\u{2753}';
-            document.getElementById('player-item-text').innerText = 'Item ingezet!';
+            if (hdr) hdr.innerText = 'ITEM INGEZET!';
+            document.getElementById('player-item-text').innerText = 'Even wachten op volgend item...';
+            itemBtn.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
+            itemBtn.style.borderColor = 'rgba(255,255,255,0.25)';
+            itemBtn.style.boxShadow = 'none';
             itemBtn.onclick = null;
           };
         } else {
           document.getElementById('player-item-emoji').innerText = '\u{2753}';
-          document.getElementById('player-item-text').innerText = 'Geen item';
-          itemBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+          const hdr = document.getElementById('player-item-header');
+          if (hdr) hdr.innerText = 'SPECIALE ITEM BOX';
+          document.getElementById('player-item-text').innerText = 'Beantwoord vragen snel goed om items te winnen!';
+          itemBtn.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
+          itemBtn.style.borderColor = 'rgba(255,255,255,0.25)';
+          itemBtn.style.boxShadow = 'none';
           itemBtn.onclick = null;
         }
       }
@@ -2871,6 +2986,7 @@ const QUESTIONS = {
       document.getElementById('podium-screen').classList.add('active');
 
       const sorted = [...State.players].sort((a,b) => (b.progress * 100 + b.score) - (a.progress * 100 + a.score));
+      stopRaceBGM();
       playSound('victory');
       startConfetti();
 
@@ -3039,7 +3155,8 @@ const QUESTIONS = {
       initAvatarPicker();
 
       const urlParams = new URLSearchParams(window.location.search);
-      const initialRole = urlParams.get('role') || 'host';
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+      const initialRole = urlParams.get('role') || (isMobile ? 'player' : 'host');
       const initialPin = urlParams.get('pin');
       if (initialPin) document.getElementById('player-pin-input').value = initialPin;
 
@@ -3056,6 +3173,44 @@ const QUESTIONS = {
         soundEnabled = !soundEnabled;
         document.getElementById('sound-status').innerText = soundEnabled ? 'Aan' : 'Uit';
         document.getElementById('audio-toggle-btn').querySelector('i').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+        if (!soundEnabled) {
+          stopRaceBGM();
+        } else if (State.role === 'host' && document.getElementById('host-race-screen').classList.contains('active')) {
+          startRaceBGM();
+        }
+      };
+
+      const joker5050 = document.getElementById('player-joker-5050');
+      if (joker5050) {
+        joker5050.onclick = () => {
+          if (joker5050.disabled) return;
+          joker5050.disabled = true;
+          joker5050.style.opacity = '0.3';
+          const buttons = Array.from(document.querySelectorAll('#player-options-grid button'));
+          if (buttons.length > 2) {
+            let disabledCount = 0;
+            buttons.forEach(btn => {
+              if (disabledCount < 2 && Math.random() < 0.75) {
+                btn.disabled = true;
+                btn.style.opacity = '0.2';
+                btn.style.textDecoration = 'line-through';
+                disabledCount++;
+              }
+            });
+            playSound('correct');
+          }
+        };
+      }
+
+      const jokerTime = document.getElementById('player-joker-time');
+      if (jokerTime) {
+        jokerTime.onclick = () => {
+          if (jokerTime.disabled) return;
+          jokerTime.disabled = true;
+          jokerTime.style.opacity = '0.3';
+          playSound('turbo');
+          alert('â±ï¸ +20s Extra bedenktijd ingezet!');
+        };
       };
 
       document.getElementById('fullscreen-btn').onclick = () => {
