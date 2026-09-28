@@ -215,22 +215,21 @@
     }
     .form-select:focus, .form-input:focus { border-color: #ff4757; }
 
-    /* DIGIBORD LIVE QR / PIN BOX */
+    /* DIGIBORD LIVE QR & PIN BOX */
     .pin-display-box {
       background: linear-gradient(135deg, #10182b, #192542);
       border: 2px dashed var(--gold);
       border-radius: 14px;
-      padding: 18px;
-      text-align: center;
+      padding: 16px;
       margin-bottom: 18px;
     }
     .pin-code-large {
       font-family: var(--font-arcade);
-      font-size: 2.2rem;
-      letter-spacing: 4px;
+      font-size: 2rem;
+      letter-spacing: 3px;
       color: var(--gold);
       text-shadow: 0 0 15px rgba(255,165,2,0.6);
-      margin: 8px 0;
+      margin: 4px 0;
     }
 
     /* PLAYER ROSTER IN DIGIBORD LOBBY */
@@ -547,6 +546,11 @@
       pointer-events: none;
       z-index: 400;
     }
+
+    @keyframes pulseDot {
+      0% { opacity: 0.4; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
   </style>
 </head>
 <body>
@@ -635,16 +639,31 @@
           </div>
         </div>
 
-        <!-- Right: Live Pincode & Studenten Roster -->
+        <!-- Right: Live Pincode & QR Code & Studenten Startgrid -->
         <div class="lobby-card">
           <h2><i class="fa-solid fa-users text-warning"></i> 2. Studenten Startgrid</h2>
 
-          <div class="pin-display-box">
-            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;">LAAT STUDENTEN INLOGGEN MET PIN:</span>
-            <div class="pin-code-large" id="host-pin-display">CIOS-2627</div>
-            <p style="font-size:0.8rem; color:#2ed573;">
-              <i class="fa-solid fa-signal"></i> Live Cloud Synchronisatie Actief
-            </p>
+          <!-- PROMINENT QR CODE & PIN BOX -->
+          <div class="pin-display-box" style="display:flex; align-items:center; justify-content:space-around; gap:16px; flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <div style="background:#ffffff; padding:8px; border-radius:12px; display:inline-block; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
+                <img id="host-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=https://globetrotter-cios.vercel.app?pin=CIOS-2627&amp;role=player" alt="Scan QR Code om direct mee te doen!" style="width:130px; height:130px; display:block;">
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted); font-weight:bold; margin-top:6px;"><i class="fa-solid fa-camera"></i> Scan met telefooncamera</div>
+            </div>
+            
+            <div style="text-align:center; flex:1; min-width:180px;">
+              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">OF SURF NAAR:</span>
+              <div style="font-family:var(--font-arcade); font-size:0.88rem; color:var(--cyan); margin:4px 0; word-break:break-all;">
+                globetrotter-cios.vercel.app
+              </div>
+              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">EN VOER DEZE PIN IN:</span>
+              <div class="pin-code-large" id="host-pin-display">CIOS-2627</div>
+              <div style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; color:#2ed573; background:rgba(46,213,115,0.1); padding:3px 10px; border-radius:20px;">
+                <span style="width:8px; height:8px; border-radius:50%; background:#2ed573; display:inline-block; animation:pulseDot 1s infinite alternate;"></span>
+                <span id="host-sync-status">Live Cloud Verbonden</span>
+              </div>
+            </div>
           </div>
 
           <p style="font-size:0.85rem; font-weight:bold; color:var(--text-muted); margin-bottom:8px;">
@@ -666,7 +685,9 @@
     <!-- ==================== SCREEN 1B: STUDENT CONTROLLER LOBBY ==================== -->
     <section id="player-lobby-screen" class="screen">
       <div class="student-join-box">
-        <h2 style="font-family:var(--font-title); font-size:1.4rem; color:#fff; text-align:center; margin-bottom:6px;"><i class="fa-solid fa-flag-checkered text-danger"></i> Doe Mee aan de Race! <i class="fa-solid fa-flag-checkered text-danger"></i></h2>
+        <h2 style="font-family:var(--font-title); font-size:1.4rem; color:#fff; text-align:center; margin-bottom:6px;">
+          <i class="fa-solid fa-flag-checkered text-danger"></i> Doe Mee aan de Race! <i class="fa-solid fa-flag-checkered text-danger"></i>
+        </h2>
         <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:20px;">
           Vul je naam in, kies je Mario Kart avatar en race live mee tegen je klasgenoten!
         </p>
@@ -721,12 +742,21 @@
         
         <!-- Live Question on Digibord -->
         <div class="question-card-live">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
             <span style="font-size:0.88rem; font-weight:800; color:var(--cyan);" id="arena-q-topic">
               &#x1F30D; Spanje | Didactiek &amp; Omgangsvormen
             </span>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-family:var(--font-arcade); font-size:1.1rem; color:var(--gold);" id="arena-timer-num">25</span>s
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <span id="arena-answers-count" style="font-size:0.82rem; color:var(--text-muted); font-weight:700; background:rgba(255,255,255,0.08); padding:4px 10px; border-radius:12px;">
+                <i class="fa-solid fa-users"></i> 0 antwoorden binnen
+              </span>
+              <div style="display:flex; align-items:center; gap:4px; font-family:var(--font-arcade); font-size:1.1rem; color:var(--gold);">
+                <i class="fa-regular fa-clock" style="font-size:0.9rem;"></i>
+                <span id="arena-timer-num">25</span>s
+              </div>
+              <button id="arena-skip-timer-btn" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:bold; cursor:pointer;" title="Sluit vraag direct en toon uitslag">
+                <i class="fa-solid fa-forward-step"></i> Sluit Vraag
+              </button>
             </div>
           </div>
 
@@ -2049,13 +2079,14 @@ const QUESTIONS = {
     // GAME STATE
     // ==========================================
     const State = {
-      role: 'host', // 'host' (digibord) or 'player' (student)
+      role: 'host',
       gamePin: 'CIOS-2627',
       circuit: 'world',
       totalLaps: 10,
       currentLap: 1,
       players: [],
       myPlayerId: null,
+      myPlayerInfo: null,
       currentQuestion: null,
       timerSec: 25,
       timerInterval: null,
@@ -2064,23 +2095,48 @@ const QUESTIONS = {
       allowJokers: true,
       raceFinished: false,
       canvasAnimId: null,
-      trackSpline: []
+      trackSpline: [],
+      isSubscribed: false
     };
 
     // ==========================================
-    // REALTIME NETWORKING (Broadcast Rooms)
+    // REALTIME NETWORKING (Resilient Handshake & Heartbeat)
     // ==========================================
-    function initRealtimeRoom() {
+    function initRealtimeRoom(onConnected) {
       if (!supabaseClient) return;
 
       const roomName = `room-${State.gamePin.toLowerCase()}`;
+
+      // If already connected to this channel, run callback directly
+      if (realtimeChannel && State.isSubscribed) {
+        if (onConnected) onConnected();
+        return;
+      }
+
+      if (realtimeChannel) {
+        try { supabaseClient.removeChannel(realtimeChannel); } catch (e) {}
+      }
+
       realtimeChannel = supabaseClient.channel(roomName, {
-        config: { broadcast: { self: false } }
+        config: { broadcast: { ack: true, self: false } }
       });
 
       realtimeChannel
         .on('broadcast', { event: 'player-join' }, ({ payload }) => {
-          if (State.role === 'host') handlePlayerJoined(payload);
+          if (State.role === 'host') {
+            handlePlayerJoined(payload);
+            broadcastEvent('player-join-ack', { playerId: payload.id, count: State.players.length });
+          }
+        })
+        .on('broadcast', { event: 'player-join-ack' }, ({ payload }) => {
+          if (State.role === 'player' && payload.playerId === State.myPlayerId) {
+            document.getElementById('player-card-character').innerText = `Verbonden met Digibord! (${payload.count} racers in grid)`;
+          }
+        })
+        .on('broadcast', { event: 'host-ping' }, () => {
+          if (State.role === 'player' && State.myPlayerInfo) {
+            broadcastEvent('player-join', State.myPlayerInfo);
+          }
         })
         .on('broadcast', { event: 'game-start' }, ({ payload }) => {
           if (State.role === 'player') handleGameStartedByHost(payload);
@@ -2096,17 +2152,29 @@ const QUESTIONS = {
         })
         .on('broadcast', { event: 'state-broadcast' }, ({ payload }) => {
           if (State.role === 'player') handleStateSyncFromHost(payload);
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            console.log(`Connected to Realtime Room: ${roomName}`);
-          }
         });
+
+      realtimeChannel.subscribe((status) => {
+        console.log(`Realtime Channel Status: ${status}`);
+        if (status === 'SUBSCRIBED') {
+          State.isSubscribed = true;
+          const statusTag = document.getElementById('host-sync-status');
+          if (statusTag) statusTag.innerText = 'Live Cloud Verbonden';
+          if (onConnected) onConnected();
+        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          State.isSubscribed = false;
+          const statusTag = document.getElementById('host-sync-status');
+          if (statusTag) statusTag.innerText = 'Opnieuw verbinden...';
+          setTimeout(() => initRealtimeRoom(onConnected), 2500);
+        }
+      });
     }
 
     function broadcastEvent(event, payload) {
-      if (realtimeChannel) {
-        realtimeChannel.send({ type: 'broadcast', event, payload }).catch(()=>{});
+      if (realtimeChannel && State.isSubscribed) {
+        realtimeChannel.send({ type: 'broadcast', event, payload }).catch(err => {
+          console.warn('Broadcast send error:', err);
+        });
       }
     }
 
@@ -2117,7 +2185,6 @@ const QUESTIONS = {
       const canvas = document.getElementById('race-canvas');
       const ctx = canvas.getContext('2d');
 
-      // Precompute Circuit Path Points (Grand Prix Oval with Chicane)
       const w = canvas.width;
       const h = canvas.height;
       const points = [];
@@ -2125,7 +2192,6 @@ const QUESTIONS = {
 
       for (let i = 0; i < steps; i++) {
         const t = (i / steps) * Math.PI * 2;
-        // Formula for a smooth, curved grand prix loop
         const rx = (w / 2) - 100;
         const ry = (h / 2) - 65;
         const cx = w / 2;
@@ -2134,7 +2200,6 @@ const QUESTIONS = {
         let x = cx + rx * Math.cos(t);
         let y = cy + ry * Math.sin(t);
 
-        // Add chicane bend
         if (t > Math.PI * 0.2 && t < Math.PI * 0.8) {
           y += Math.sin(t * 3) * 20;
         }
@@ -2143,7 +2208,6 @@ const QUESTIONS = {
       }
       State.trackSpline = points;
 
-      // Start render loop
       if (State.canvasAnimId) cancelAnimationFrame(State.canvasAnimId);
       function render() {
         drawTrack(ctx, canvas.width, canvas.height);
@@ -2154,17 +2218,16 @@ const QUESTIONS = {
     }
 
     function drawTrack(ctx, w, h) {
-      // 1. Green Infield & Grass Background
+      // Grass
       ctx.fillStyle = '#1b7a42';
       ctx.fillRect(0, 0, w, h);
 
-      // Infield terrain accents
       ctx.fillStyle = '#166536';
       ctx.beginPath();
       ctx.arc(w / 2, h / 2, 70, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Red & White Rumble Strips (Curbstones)
+      // Red & white curbstones
       ctx.lineWidth = 76;
       ctx.strokeStyle = '#e74c3c';
       ctx.setLineDash([18, 18]);
@@ -2176,25 +2239,24 @@ const QUESTIONS = {
       ctx.closePath();
       ctx.stroke();
 
-      // White dashes
       ctx.strokeStyle = '#ffffff';
       ctx.lineDashOffset = 18;
       ctx.stroke();
 
-      // 3. Dark Asphalt Track Road
+      // Asphalt
       ctx.setLineDash([]);
       ctx.lineWidth = 62;
       ctx.strokeStyle = '#2d3436';
       ctx.stroke();
 
-      // 4. White Dashed Center Line
+      // Dashed line
       ctx.lineWidth = 2;
       ctx.strokeStyle = 'rgba(255,255,255,0.6)';
       ctx.setLineDash([10, 10]);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 5. Checkered Finish Line at Start
+      // Finish line
       const startP = State.trackSpline[0];
       const nextP = State.trackSpline[1];
       const angle = Math.atan2(nextP.y - startP.y, nextP.x - startP.x) + Math.PI / 2;
@@ -2225,18 +2287,16 @@ const QUESTIONS = {
     function drawKarts(ctx) {
       if (!State.players) return;
 
-      State.players.forEach((player, rankIdx) => {
+      State.players.forEach((player) => {
         const { x, y, angle } = getTrackCoordinates(player.progress);
 
-        // Stagger lanes slightly so karts don't fully overlap
-        const laneOffset = ((player.id % 5) - 2) * 8;
+        const laneOffset = ((String(player.id).charCodeAt(String(player.id).length - 1) % 5) - 2) * 8;
         const finalX = x + Math.cos(angle + Math.PI/2) * laneOffset;
         const finalY = y + Math.sin(angle + Math.PI/2) * laneOffset;
 
         ctx.save();
         ctx.translate(finalX, finalY);
 
-        // Spin slip animation if active
         if (player.spinning) {
           ctx.rotate(player.spinAngle || 0);
           player.spinAngle = (player.spinAngle || 0) + 0.4;
@@ -2244,7 +2304,7 @@ const QUESTIONS = {
           ctx.rotate(angle);
         }
 
-        // Draw Kart Body
+        // Body
         ctx.fillStyle = player.color || '#ff4757';
         ctx.beginPath();
         ctx.roundRect(-12, -7, 24, 14, 4);
@@ -2260,19 +2320,18 @@ const QUESTIONS = {
         ctx.fillRect(-10, 7, 6, 2);
         ctx.fillRect(4, 7, 6, 2);
 
-        // Character Emoji Head
+        // Character Emoji
         ctx.font = '14px Outfit, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(player.emoji || '\u{1F344}', 0, 0);
 
-        // Turbo Flames if boosted
         if (player.boosted) {
           ctx.font = '12px Outfit';
           ctx.fillText('\u{1F525}', -18, 0);
         }
 
-        // Student Name Tag above Kart
+        // Name tag
         ctx.rotate(-angle);
         ctx.font = 'bold 9px Plus Jakarta Sans, sans-serif';
         ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -2309,23 +2368,28 @@ const QUESTIONS = {
     }
 
     // ==========================================
-    // ROLE SWITCHING (Host Digibord vs Player)
+    // ROLE SWITCHING
     // ==========================================
     function switchRole(role) {
       State.role = role;
       document.getElementById('role-host-btn').classList.toggle('active', role === 'host');
       document.getElementById('role-player-btn').classList.toggle('active', role === 'player');
 
-      // Hide all main screens
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
       if (role === 'host') {
         document.getElementById('host-lobby-screen').classList.add('active');
+        initRealtimeRoom();
+        // Periodically broadcast ping to discover connecting students
+        setInterval(() => {
+          if (State.role === 'host' && document.getElementById('host-lobby-screen').classList.contains('active')) {
+            broadcastEvent('host-ping', { pin: State.gamePin });
+          }
+        }, 2500);
       } else {
         document.getElementById('player-lobby-screen').classList.add('active');
+        initRealtimeRoom();
       }
-
-      initRealtimeRoom();
     }
 
     // ==========================================
@@ -2389,7 +2453,7 @@ const QUESTIONS = {
     // ==========================================
     function startHostGrandPrix() {
       if (State.players.length === 0) {
-        addBots(); // Ensure at least bots exist if docent clicks start directly
+        addBots();
       }
 
       State.circuit = document.getElementById('circuit-select').value;
@@ -2406,7 +2470,6 @@ const QUESTIONS = {
       initTrackCanvas();
       playSound('go');
 
-      // Broadcast start to student phones
       broadcastEvent('game-start', {
         circuit: State.circuit,
         totalLaps: State.totalLaps
@@ -2429,7 +2492,6 @@ const QUESTIONS = {
       if (State.raceFinished) return;
       clearInterval(State.timerInterval);
 
-      // Check if leader crossed finish line
       const maxProgress = Math.max(...State.players.map(p => p.progress));
       if (maxProgress >= 95 || State.currentLap > State.totalLaps) {
         finishGrandPrixHost();
@@ -2438,7 +2500,13 @@ const QUESTIONS = {
 
       document.getElementById('arena-current-lap').innerText = State.currentLap;
 
-      // Pick Random Question
+      State.answersThisRound = new Set();
+      const humanRacers = State.players.filter(p => !p.id.startsWith('bot-'));
+      const ansCounter = document.getElementById('arena-answers-count');
+      if (ansCounter) {
+        ansCounter.innerHTML = `<i class="fa-solid fa-users"></i> 0 / ${humanRacers.length} binnen`;
+      }
+
       const countries = getCountriesForCircuit(State.circuit);
       const randomCountryKey = countries[Math.floor(Math.random() * countries.length)];
       const cData = gameQuestions[randomCountryKey];
@@ -2447,7 +2515,6 @@ const QUESTIONS = {
       const q = cData.questions[Math.floor(Math.random() * cData.questions.length)];
       State.currentQuestion = { ...q, country: cData.title || randomCountryKey };
 
-      // Update Host Digibord UI
       document.getElementById('arena-q-topic').innerHTML = `&#x1F30D; ${State.currentQuestion.country} | Sportcultuur`;
       document.getElementById('arena-checkpoint-tag').innerHTML = `&#x1F30D; Checkpoint ${State.currentLap}: ${State.currentQuestion.country}`;
       document.getElementById('arena-question-text').innerText = q.question;
@@ -2464,7 +2531,6 @@ const QUESTIONS = {
         }
       });
 
-      // Broadcast Question to Student Phones
       broadcastEvent('question-sync', {
         question: q.question,
         options: q.options,
@@ -2493,7 +2559,6 @@ const QUESTIONS = {
     }
 
     function handleRoundTimeout() {
-      // Simulate Bot answers if bots are present
       State.players.filter(p => p.id.startsWith('bot-')).forEach(b => {
         if (Math.random() < 0.65) {
           b.progress = Math.min(95, b.progress + (100 / State.totalLaps));
@@ -2516,26 +2581,32 @@ const QUESTIONS = {
       State.myPlayerId = `player-${Date.now()}`;
       const char = MARIO_KART_CHARACTERS.find(c => c.id === selectedCharId);
 
-      initRealtimeRoom();
-
-      // Broadcast to host
-      broadcastEvent('player-join', {
+      State.myPlayerInfo = {
         id: State.myPlayerId,
         name: name,
         charId: char.id,
         emoji: char.emoji,
         color: char.color
-      });
+      };
 
-      // Update student hero card
       document.getElementById('player-card-name').innerText = name;
       document.getElementById('player-card-emoji').innerText = char.emoji;
-      document.getElementById('player-card-character').innerText = char.name;
+      document.getElementById('player-card-character').innerText = `${char.name} (Verbinden met Digibord...)`;
 
       document.getElementById('player-lobby-screen').classList.remove('active');
       document.getElementById('player-race-screen').classList.add('active');
 
-      logEvent(`\u{1F3C1} Aangemeld als ${name} (${char.name})! Wachten op startsein van docent...`);
+      // Connect and broadcast once subscribed
+      initRealtimeRoom(() => {
+        broadcastEvent('player-join', State.myPlayerInfo);
+        const joinLoop = setInterval(() => {
+          if (State.raceFinished || State.currentQuestion) {
+            clearInterval(joinLoop);
+            return;
+          }
+          broadcastEvent('player-join', State.myPlayerInfo);
+        }, 2000);
+      });
     }
 
     function handleGameStartedByHost(payload) {
@@ -2563,7 +2634,16 @@ const QUESTIONS = {
     }
 
     function submitPlayerAnswer(letter) {
-      document.querySelectorAll('#player-options-grid button').forEach(b => b.disabled = true);
+      document.querySelectorAll('#player-options-grid button').forEach(b => {
+        b.disabled = true;
+        if (b.innerText.trim().startsWith(letter)) {
+          b.style.borderColor = 'var(--cyan)';
+          b.style.background = 'rgba(0, 210, 211, 0.25)';
+          b.style.boxShadow = '0 0 15px rgba(0, 210, 211, 0.5)';
+        } else {
+          b.style.opacity = '0.4';
+        }
+      });
       broadcastEvent('answer-submit', {
         playerId: State.myPlayerId,
         answer: letter
@@ -2578,6 +2658,9 @@ const QUESTIONS = {
       const player = State.players.find(p => p.id === payload.playerId);
       if (!player || !State.currentQuestion) return;
 
+      State.answersThisRound = State.answersThisRound || new Set();
+      State.answersThisRound.add(payload.playerId);
+
       const isCorrect = (payload.answer === State.currentQuestion.correct);
 
       if (isCorrect) {
@@ -2585,7 +2668,7 @@ const QUESTIONS = {
         player.streak++;
 
         let meters = (100 / State.totalLaps);
-        if (State.timerSec > 15) meters *= 1.25; // Speed boost
+        if (State.timerSec > 15) meters *= 1.25;
 
         if (player.starRounds > 0) {
           meters *= 2;
@@ -2596,7 +2679,6 @@ const QUESTIONS = {
         player.boosted = true;
         setTimeout(() => player.boosted = false, 1200);
 
-        // Roll Mario Kart item if none
         if (State.allowItems && !player.item) {
           rollPlayerItem(player);
         }
@@ -2609,8 +2691,19 @@ const QUESTIONS = {
         logArenaEvent(`\u{1F34C} ${player.name} slipt op een fout antwoord!`);
       }
 
+      const humanRacers = State.players.filter(p => !p.id.startsWith('bot-'));
+      const ansCounter = document.getElementById('arena-answers-count');
+      if (ansCounter) {
+        ansCounter.innerHTML = `<i class="fa-solid fa-users"></i> ${State.answersThisRound.size} / ${humanRacers.length} binnen`;
+      }
+
       updateArenaLeaderboard();
       syncStateToStudents();
+
+      if (humanRacers.length > 0 && State.answersThisRound.size >= humanRacers.length) {
+        clearInterval(State.timerInterval);
+        setTimeout(() => handleRoundTimeout(), 1000);
+      }
     }
 
     function rollPlayerItem(player) {
@@ -2945,7 +3038,6 @@ const QUESTIONS = {
       loadActiveQuestions();
       initAvatarPicker();
 
-      // Check URL parameters (e.g. ?role=player or ?pin=1234)
       const urlParams = new URLSearchParams(window.location.search);
       const initialRole = urlParams.get('role') || 'host';
       const initialPin = urlParams.get('pin');
@@ -2953,39 +3045,40 @@ const QUESTIONS = {
 
       switchRole(initialRole);
 
-      // Role button clicks
       document.getElementById('role-host-btn').onclick = () => switchRole('host');
       document.getElementById('role-player-btn').onclick = () => switchRole('player');
 
-      // Item Guide modal
       document.getElementById('open-item-guide-btn').onclick = () => document.getElementById('item-guide-modal').classList.add('active');
       document.getElementById('close-item-guide-btn').onclick = () => document.getElementById('item-guide-modal').classList.remove('active');
       document.getElementById('guide-understood-btn').onclick = () => document.getElementById('item-guide-modal').classList.remove('active');
 
-      // Audio toggle
       document.getElementById('audio-toggle-btn').onclick = () => {
         soundEnabled = !soundEnabled;
         document.getElementById('sound-status').innerText = soundEnabled ? 'Aan' : 'Uit';
         document.getElementById('audio-toggle-btn').querySelector('i').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
       };
 
-      // Fullscreen
       document.getElementById('fullscreen-btn').onclick = () => {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
         else document.exitFullscreen().catch(()=>{});
       };
 
-      // Restart
       document.getElementById('restart-game-btn').onclick = () => {
         if (confirm('Spel opnieuw instellen?')) location.reload();
       };
       document.getElementById('podium-rematch-btn').onclick = () => location.reload();
 
-      // Host start button
       document.getElementById('start-grandprix-host-btn').onclick = startHostGrandPrix;
       document.getElementById('add-bots-btn').onclick = addBots;
 
-      // Student join button
+      const skipBtn = document.getElementById('arena-skip-timer-btn');
+      if (skipBtn) {
+        skipBtn.onclick = () => {
+          clearInterval(State.timerInterval);
+          handleRoundTimeout();
+        };
+      }
+
       document.getElementById('player-join-btn').onclick = joinAsPlayer;
 
       setupQuestionsEditor();
