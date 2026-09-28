@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Supabase Cloud Sync CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Three.js 3D WebGL Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     :root {
       --bg-dark: #090e18;
@@ -730,9 +732,18 @@
         </div>
       </div>
 
-      <!-- THE 2D MARIO KART CANVAS CIRCUIT -->
-      <div class="track-canvas-container">
-        <canvas id="race-canvas" width="1200" height="380"></canvas>
+      <!-- 3D & 2D MARIO KART CIRCUIT ARENA -->
+      <div class="track-canvas-container" style="position:relative; height:400px;">
+        <!-- 3D / 2D View Mode Toggle -->
+        <button id="toggle-view-mode-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.25); color:#fff; font-size:0.75rem; padding:6px 14px; border-radius:20px; cursor:pointer;" title="Wissel tussen 3D Mario Kart Arena en 2D Baanoverzicht">
+          <i class="fa-solid fa-cube text-warning"></i> <span id="view-mode-label">Weergave: <strong>3D Arena</strong></span>
+        </button>
+
+        <!-- 3D WebGL Three.js Scene -->
+        <div id="three-track-container" style="width:100%; height:100%; position:absolute; top:0; left:0;"></div>
+
+        <!-- 2D Canvas Fallback -->
+        <canvas id="race-canvas" width="1200" height="400" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
       </div>
 
       <!-- Bottom Grid: Current Question + Live Leaderboard -->
@@ -2177,6 +2188,7 @@ const QUESTIONS = {
       allowItems: true,
       allowBlueShell: true,
       allowJokers: true,
+      viewMode: '3d',
       raceFinished: false,
       canvasAnimId: null,
       trackSpline: [],
@@ -2259,6 +2271,407 @@ const QUESTIONS = {
         realtimeChannel.send({ type: 'broadcast', event, payload }).catch(err => {
           console.warn('Broadcast send error:', err);
         });
+      }
+    }
+
+    // ==========================================
+    // 3D THREE.JS MARIO KART CIRCUIT ENGINE
+    // ==========================================
+    let threeScene, threeCamera, threeRenderer;
+    let threeTrackCurve, threeKartsMap = new Map();
+    let threeAnimId = null;
+    let threeInitialized = false;
+
+    function init3DTrackEngine() {
+      const container = document.getElementById('three-track-container');
+      if (!container || typeof THREE === 'undefined') {
+        initTrackCanvas();
+        return;
+      }
+
+      if (threeInitialized) {
+        animate3D();
+        return;
+      }
+
+      const width = container.clientWidth || 1100;
+      const height = container.clientHeight || 400;
+
+      // 1. Scene with Nintendo Sky Blue & Fog
+      threeScene = new THREE.Scene();
+      threeScene.background = new THREE.Color(0x70c5ff);
+      threeScene.fog = new THREE.FogExp2(0x70c5ff, 0.0022);
+
+      // 2. Camera
+      threeCamera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
+      threeCamera.position.set(0, 160, 240);
+      threeCamera.lookAt(0, 0, 0);
+
+      // 3. Renderer
+      threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      threeRenderer.setSize(width, height);
+      threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      threeRenderer.shadowMap.enabled = true;
+      threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.innerHTML = '';
+      container.appendChild(threeRenderer.domElement);
+
+      // 4. Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      threeScene.add(ambientLight);
+
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x44bb44, 0.4);
+      threeScene.add(hemiLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfff8e7, 0.9);
+      sunLight.position.set(120, 250, 120);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 600;
+      sunLight.shadow.camera.left = -250;
+      sunLight.shadow.camera.right = 250;
+      sunLight.shadow.camera.top = 250;
+      sunLight.shadow.camera.bottom = -250;
+      threeScene.add(sunLight);
+
+      // 5. Green Terrain & Trees
+      const groundGeo = new THREE.PlaneGeometry(1400, 900, 32, 32);
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.8 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.5;
+      ground.receiveShadow = true;
+      threeScene.add(ground);
+
+      for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * Math.PI * 2;
+        const dist = 230 + Math.random() * 70;
+        const tx = Math.cos(angle) * dist;
+        const tz = Math.sin(angle) * dist;
+
+        const trunkGeo = new THREE.CylinderGeometry(2, 3, 12, 6);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x795548 });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.set(tx, 6, tz);
+        trunk.castShadow = true;
+        threeScene.add(trunk);
+
+        const foliageGeo = new THREE.ConeGeometry(9, 20, 7);
+        const foliageMat = new THREE.MeshStandardMaterial({ color: (i % 2 === 0 ? 0x2ecc71 : 0x1abc9c) });
+        const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+        foliage.position.set(tx, 18, tz);
+        foliage.castShadow = true;
+        threeScene.add(foliage);
+      }
+
+      // 6. 3D Mario Kart Spline Track
+      const curvePoints = [
+        new THREE.Vector3(-180, 0, -80),
+        new THREE.Vector3(-90, 6, -110),
+        new THREE.Vector3(60, 2, -100),
+        new THREE.Vector3(160, 0, -50),
+        new THREE.Vector3(190, 4, 30),
+        new THREE.Vector3(130, 8, 95),
+        new THREE.Vector3(30, 10, 65),
+        new THREE.Vector3(-50, 4, 85),
+        new THREE.Vector3(-140, 0, 70),
+        new THREE.Vector3(-200, 2, 0)
+      ];
+      threeTrackCurve = new THREE.CatmullRomCurve3(curvePoints, true, 'centripetal');
+
+      build3DTrackMesh(threeTrackCurve);
+      build3DFinishBanner(threeTrackCurve);
+
+      threeInitialized = true;
+      animate3D();
+
+      window.addEventListener('resize', () => {
+        if (!container || !threeCamera || !threeRenderer) return;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        if (w > 0 && h > 0) {
+          threeCamera.aspect = w / h;
+          threeCamera.updateProjectionMatrix();
+          threeRenderer.setSize(w, h);
+        }
+      });
+    }
+
+    function build3DTrackMesh(curve) {
+      const segments = 220;
+      const trackWidth = 32;
+      const curbWidth = 3.5;
+
+      const trackGeo = new THREE.BufferGeometry();
+      const pos = [];
+      const uvs = [];
+      const indices = [];
+
+      const curbGeoL = new THREE.BufferGeometry();
+      const posCL = [];
+      const curbGeoR = new THREE.BufferGeometry();
+      const posCR = [];
+
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const pt = curve.getPointAt(t);
+        const tangent = curve.getTangentAt(t).normalize();
+        const up = new THREE.Vector3(0, 1, 0);
+        const normal = new THREE.Vector3().crossVectors(tangent, up).normalize();
+
+        const left = new THREE.Vector3().copy(pt).addScaledVector(normal, -trackWidth / 2);
+        const right = new THREE.Vector3().copy(pt).addScaledVector(normal, trackWidth / 2);
+
+        pos.push(left.x, left.y + 0.15, left.z);
+        pos.push(right.x, right.y + 0.15, right.z);
+        uvs.push(0, t * 12);
+        uvs.push(1, t * 12);
+
+        const curbLeftOuter = new THREE.Vector3().copy(left).addScaledVector(normal, -curbWidth);
+        posCL.push(curbLeftOuter.x, curbLeftOuter.y + 0.25, curbLeftOuter.z);
+        posCL.push(left.x, left.y + 0.25, left.z);
+
+        const curbRightOuter = new THREE.Vector3().copy(right).addScaledVector(normal, curbWidth);
+        posCR.push(right.x, right.y + 0.25, right.z);
+        posCR.push(curbRightOuter.x, curbRightOuter.y + 0.25, curbRightOuter.z);
+
+        if (i < segments) {
+          const a = i * 2;
+          const b = a + 1;
+          const c = a + 2;
+          const d = a + 3;
+          indices.push(a, b, c);
+          indices.push(b, d, c);
+        }
+      }
+
+      trackGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      trackGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      trackGeo.setIndex(indices);
+      trackGeo.computeVertexNormals();
+
+      const trackMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.6, metalness: 0.1 });
+      const trackMesh = new THREE.Mesh(trackGeo, trackMat);
+      trackMesh.receiveShadow = true;
+      threeScene.add(trackMesh);
+
+      curbGeoL.setAttribute('position', new THREE.Float32BufferAttribute(posCL, 3));
+      curbGeoL.setIndex(indices);
+      curbGeoL.computeVertexNormals();
+      const curbMeshL = new THREE.Mesh(curbGeoL, new THREE.MeshStandardMaterial({ color: 0xe74c3c, roughness: 0.5 }));
+      threeScene.add(curbMeshL);
+
+      curbGeoR.setAttribute('position', new THREE.Float32BufferAttribute(posCR, 3));
+      curbGeoR.setIndex(indices);
+      curbGeoR.computeVertexNormals();
+      const curbMeshR = new THREE.Mesh(curbGeoR, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }));
+      threeScene.add(curbMeshR);
+    }
+
+    function build3DFinishBanner(curve) {
+      const pt = curve.getPointAt(0);
+      const tangent = curve.getTangentAt(0).normalize();
+      const up = new THREE.Vector3(0, 1, 0);
+      const normal = new THREE.Vector3().crossVectors(tangent, up).normalize();
+
+      const archGroup = new THREE.Group();
+      archGroup.position.copy(pt);
+
+      const pillarGeo = new THREE.CylinderGeometry(1.4, 1.6, 26, 12);
+      const pillarMat = new THREE.MeshStandardMaterial({ color: 0xff4757, metalness: 0.4 });
+
+      const pLeft = new THREE.Mesh(pillarGeo, pillarMat);
+      pLeft.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(-18));
+      pLeft.position.y = 13;
+      pLeft.castShadow = true;
+      archGroup.add(pLeft);
+
+      const pRight = new THREE.Mesh(pillarGeo, pillarMat);
+      pRight.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(18));
+      pRight.position.y = 13;
+      pRight.castShadow = true;
+      archGroup.add(pRight);
+
+      const barGeo = new THREE.BoxGeometry(38, 6, 2.5);
+      const barMat = new THREE.MeshStandardMaterial({ color: 0xffa502, metalness: 0.2 });
+      const bar = new THREE.Mesh(barGeo, barMat);
+      bar.position.y = 25;
+      bar.lookAt(new THREE.Vector3().copy(pt).add(tangent));
+      bar.castShadow = true;
+      archGroup.add(bar);
+
+      const stripGeo = new THREE.PlaneGeometry(32, 5);
+      const stripMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const strip = new THREE.Mesh(stripGeo, stripMat);
+      strip.rotation.x = -Math.PI / 2;
+      strip.position.y = 0.25;
+      archGroup.add(strip);
+
+      threeScene.add(archGroup);
+    }
+
+    function create3DKart(player) {
+      const kart = new THREE.Group();
+
+      const bodyGeo = new THREE.BoxGeometry(7, 3, 11);
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: player.color || 0xff4757,
+        roughness: 0.25,
+        metalness: 0.35
+      });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 2.4;
+      body.castShadow = true;
+      kart.add(body);
+
+      const noseGeo = new THREE.BoxGeometry(5.5, 1.8, 4);
+      const nose = new THREE.Mesh(noseGeo, bodyMat);
+      nose.position.set(0, 2, 6);
+      nose.castShadow = true;
+      kart.add(nose);
+
+      const wheelGeo = new THREE.CylinderGeometry(1.8, 1.8, 1.4, 14);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.7 });
+
+      const wheelPositions = [
+        [-4, 1.8, 4],
+        [4, 1.8, 4],
+        [-4, 1.8, -4],
+        [4, 1.8, -4]
+      ];
+      wheelPositions.forEach(([wx, wy, wz]) => {
+        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(wx, wy, wz);
+        wheel.castShadow = true;
+        kart.add(wheel);
+
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1.45, 10), rimMat);
+        hub.rotation.z = Math.PI / 2;
+        hub.position.set(wx, wy, wz);
+        kart.add(hub);
+      });
+
+      // Character Billboard Sprite
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.beginPath();
+      ctx.roundRect(10, 48, 236, 68, 16);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = player.color || '#fff';
+      ctx.stroke();
+
+      ctx.font = '50px Outfit, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(player.emoji || 'ðŸŽï¸', 128, 48);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 22px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(player.name.substring(0, 14), 128, 92);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.position.set(0, 11, 0);
+      sprite.scale.set(16, 8, 1);
+      kart.add(sprite);
+
+      // Turbo boost flame
+      const flameGeo = new THREE.ConeGeometry(2, 6, 8);
+      const flameMat = new THREE.MeshBasicMaterial({ color: 0xff4757, transparent: true, opacity: 0 });
+      const flame = new THREE.Mesh(flameGeo, flameMat);
+      flame.rotation.x = -Math.PI / 2;
+      flame.position.set(0, 2.5, -7);
+      kart.add(flame);
+      kart.flameMesh = flame;
+
+      threeScene.add(kart);
+      threeKartsMap.set(player.id, kart);
+      return kart;
+    }
+
+    function animate3D() {
+      if (!threeScene || !threeCamera || !threeRenderer) return;
+      if (State.viewMode !== '3d') return;
+
+      threeAnimId = requestAnimationFrame(animate3D);
+
+      if (threeTrackCurve && State.players) {
+        let leadKartPos = null;
+        let maxProg = -1;
+
+        State.players.forEach(player => {
+          let kart = threeKartsMap.get(player.id);
+          if (!kart) kart = create3DKart(player);
+
+          const t = Math.max(0, Math.min(99.9, player.progress)) / 100;
+          const pos = threeTrackCurve.getPointAt(t);
+          const tangent = threeTrackCurve.getTangentAt(t).normalize();
+          const up = new THREE.Vector3(0, 1, 0);
+          const normal = new THREE.Vector3().crossVectors(tangent, up).normalize();
+
+          const laneOffset = ((String(player.id).charCodeAt(String(player.id).length - 1) % 5) - 2) * 4;
+          kart.position.copy(pos).addScaledVector(normal, laneOffset);
+
+          if (player.spinning) {
+            kart.rotation.y += 0.35;
+          } else {
+            kart.lookAt(new THREE.Vector3().copy(pos).add(tangent).addScaledVector(normal, laneOffset));
+          }
+
+          if (kart.flameMesh) {
+            kart.flameMesh.material.opacity = player.boosted ? 0.9 : 0;
+            if (player.boosted) kart.flameMesh.scale.set(1 + Math.random()*0.5, 1 + Math.random()*0.8, 1);
+          }
+
+          if (player.progress > maxProg) {
+            maxProg = player.progress;
+            leadKartPos = kart.position;
+          }
+        });
+
+        // Dynamic 3D Camera tracking the leader smoothly
+        if (leadKartPos) {
+          const targetCamX = leadKartPos.x * 0.45;
+          const targetCamZ = leadKartPos.z * 0.45 + 190;
+          const targetCamY = 140;
+
+          threeCamera.position.x += (targetCamX - threeCamera.position.x) * 0.04;
+          threeCamera.position.y += (targetCamY - threeCamera.position.y) * 0.04;
+          threeCamera.position.z += (targetCamZ - threeCamera.position.z) * 0.04;
+          threeCamera.lookAt(leadKartPos.x * 0.6, 8, leadKartPos.z * 0.6);
+        }
+      }
+
+      threeRenderer.render(threeScene, threeCamera);
+    }
+
+    function toggleTrackViewMode() {
+      State.viewMode = State.viewMode === '3d' ? '2d' : '3d';
+      const threeCont = document.getElementById('three-track-container');
+      const canvas2D = document.getElementById('race-canvas');
+      const label = document.getElementById('view-mode-label');
+
+      if (State.viewMode === '3d') {
+        if (threeCont) threeCont.style.display = 'block';
+        if (canvas2D) canvas2D.style.display = 'none';
+        if (label) label.innerHTML = 'Weergave: <strong>3D Arena</strong>';
+        if (State.canvasAnimId) cancelAnimationFrame(State.canvasAnimId);
+        if (!threeInitialized) init3DTrackEngine();
+        else animate3D();
+      } else {
+        if (threeCont) threeCont.style.display = 'none';
+        if (canvas2D) canvas2D.style.display = 'block';
+        if (label) label.innerHTML = 'Weergave: <strong>2D Kaart</strong>';
+        if (threeAnimId) cancelAnimationFrame(threeAnimId);
+        initTrackCanvas();
       }
     }
 
@@ -2569,7 +2982,11 @@ const QUESTIONS = {
       document.getElementById('arena-total-laps').innerText = State.totalLaps;
       document.getElementById('arena-player-count-tag').innerText = `${State.players.length} Racers op de baan`;
 
-      initTrackCanvas();
+      if (State.viewMode === '3d') {
+        init3DTrackEngine();
+      } else {
+        initTrackCanvas();
+      }
       playSound('go');
       startRaceBGM();
 
@@ -3225,6 +3642,9 @@ const QUESTIONS = {
 
       document.getElementById('start-grandprix-host-btn').onclick = startHostGrandPrix;
       document.getElementById('add-bots-btn').onclick = addBots;
+
+      const toggleViewBtn = document.getElementById('toggle-view-mode-btn');
+      if (toggleViewBtn) toggleViewBtn.onclick = toggleTrackViewMode;
 
       const skipBtn = document.getElementById('arena-skip-timer-btn');
       if (skipBtn) {
