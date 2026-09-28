@@ -135,300 +135,235 @@
       display: flex;
       flex-direction: column;
     }
-    .screen { display: none; }
-    .screen.active { display: flex; flex-direction: column; flex: 1; }
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .screen.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    /* ROLE SWITCH BAR */
+    /* ROLE SWITCHER TOP BAR */
     .role-bar {
       display: flex;
-      align-items: center;
       justify-content: center;
       gap: 12px;
       margin-bottom: 16px;
-      background: rgba(255,255,255,0.04);
-      padding: 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.08);
     }
     .role-pill {
-      background: transparent;
-      border: 2px solid rgba(255,255,255,0.15);
-      color: var(--text-muted);
-      padding: 8px 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 6px 16px;
       border-radius: 20px;
-      font-weight: 800;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       transition: all 0.2s;
+      color: var(--text-muted);
     }
     .role-pill.active {
-      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      background: #ff4757;
       color: #fff;
       border-color: #ff4757;
-      box-shadow: 0 4px 15px rgba(255,71,87,0.4);
+      box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+      font-weight: 700;
     }
 
-    /* LOBBY / SETUP STYLING */
+    /* LOBBY GRID */
     .lobby-grid {
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-    @media (max-width: 960px) {
+    @media (max-width: 900px) {
       .lobby-grid { grid-template-columns: 1fr; }
     }
     .lobby-card {
       background: var(--bg-card);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
     .lobby-card h2 {
       font-family: var(--font-title);
-      font-size: 1.25rem;
-      margin-bottom: 16px;
+      font-size: 1.2rem;
+      font-weight: 800;
       color: #fff;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 10px;
     }
-    .form-group { margin-bottom: 16px; }
+
+    /* FORMS & INPUTS */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
     .form-group label {
-      display: block;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      margin-bottom: 6px;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .form-select, .form-input {
-      width: 100%;
-      background: #0d1424;
+      background: #0a0f1d;
       border: 1px solid rgba(255,255,255,0.15);
       color: #fff;
       padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.92rem;
+      border-radius: 10px;
       font-family: var(--font-body);
+      font-size: 0.95rem;
       outline: none;
+      transition: all 0.2s;
     }
-    .form-select:focus, .form-input:focus { border-color: #ff4757; }
+    .form-select:focus, .form-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(30, 144, 255, 0.4);
+    }
 
-    /* DIGIBORD LIVE QR & PIN BOX */
+    /* PIN CODE BOX */
     .pin-display-box {
-      background: linear-gradient(135deg, #10182b, #192542);
-      border: 2px dashed var(--gold);
+      background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(255, 165, 2, 0.15));
+      border: 2px dashed rgba(255, 165, 2, 0.5);
       border-radius: 14px;
       padding: 16px;
-      margin-bottom: 18px;
+      text-align: center;
     }
     .pin-code-large {
       font-family: var(--font-arcade);
-      font-size: 2rem;
-      letter-spacing: 3px;
+      font-size: 2.2rem;
+      letter-spacing: 4px;
       color: var(--gold);
-      text-shadow: 0 0 15px rgba(255,165,2,0.6);
-      margin: 4px 0;
+      text-shadow: 0 0 15px rgba(255, 165, 2, 0.6);
+      margin: 8px 0;
     }
 
-    /* PLAYER ROSTER IN DIGIBORD LOBBY */
+    /* AVATAR PICKER GRID */
+    .avatar-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .avatar-btn {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .avatar-btn:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    .avatar-btn.active {
+      border-color: var(--gold);
+      background: rgba(255, 165, 2, 0.2);
+      box-shadow: 0 0 12px rgba(255, 165, 2, 0.4);
+    }
+    .avatar-btn .emoji { font-size: 1.8rem; }
+    .avatar-btn .name { font-size: 0.7rem; font-weight: 700; color: #fff; text-align: center; }
+
+    /* ROSTER DISPLAY */
     .roster-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
-      max-height: 280px;
+      max-height: 180px;
       overflow-y: auto;
-      margin-bottom: 16px;
-      padding: 6px;
-      background: #0a0f1c;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
+      padding: 4px;
     }
     .roster-kart-card {
-      background: #141c2e;
-      border: 2px solid #3742fa;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 10px;
       padding: 8px;
-      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      animation: popIn 0.3s ease;
+      text-align: center;
+      animation: popIn 0.2s ease-out;
     }
     @keyframes popIn {
-      0% { transform: scale(0.6); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
-    .roster-emoji { font-size: 1.8rem; }
-    .roster-name { font-size: 0.82rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-    .roster-char { font-size: 0.68rem; color: var(--gold); font-weight: bold; }
+    .roster-emoji { font-size: 1.6rem; }
+    .roster-name { font-size: 0.8rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+    .roster-char { font-size: 0.68rem; color: var(--text-muted); }
 
     /* START RACE BUTTON */
     .start-race-btn {
-      width: 100%;
       background: linear-gradient(135deg, #ff4757, #ff6b81);
-      color: #fff;
       border: none;
+      color: #fff;
+      font-family: var(--font-title);
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
       padding: 16px;
       border-radius: 12px;
-      font-family: var(--font-arcade);
-      font-size: 0.95rem;
-      letter-spacing: 1px;
       cursor: pointer;
-      box-shadow: 0 8px 25px rgba(255,71,87,0.5);
-      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+      transition: all 0.2s;
+      margin-top: 6px;
     }
     .start-race-btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(255,71,87,0.7);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.6);
+      background: linear-gradient(135deg, #ff6b81, #ff4757);
     }
 
-    /* STUDENT JOIN CARD */
-    .student-join-box {
-      max-width: 500px;
-      margin: 0 auto;
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 26px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    }
-    .avatar-picker-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-    }
-    .avatar-btn {
-      background: #0d1424;
-      border: 2px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      padding: 8px 4px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s;
-    }
-    .avatar-btn:hover { border-color: var(--cyan); }
-    .avatar-btn.active {
-      border-color: var(--gold);
-      background: rgba(255,165,2,0.15);
-      box-shadow: 0 0 12px rgba(255,165,2,0.4);
-    }
-    .avatar-btn .emoji { font-size: 1.6rem; }
-    .avatar-btn .name { font-size: 0.7rem; font-weight: bold; color: #fff; }
-
-    /* =================== RACE ARENA (DIGIBORD) =================== */
+    /* ARENA RACE SCREEN (DOCENT DIGIBORD) */
     .arena-topbar {
       background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
       padding: 10px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .checkpoint-tag {
-      background: linear-gradient(90deg, #1e90ff, #3742fa);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 800;
-      font-size: 0.88rem;
-    }
-
-    /* CANVAS TRACK CONTAINER */
-    .track-canvas-container {
-      background: #0a0f1c;
-      border: 2px solid #23314f;
-      border-radius: 16px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 8px 30px rgba(0,0,0,0.6);
-      margin-bottom: 14px;
-      width: 100%;
-      height: 380px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #race-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* RACE INTERACTION (BOTTOM) */
-    .race-bottom-grid {
-      display: grid;
-      grid-template-columns: 2.2fr 1fr;
-      gap: 16px;
-      flex: 1;
-    }
-    @media (max-width: 960px) {
-      .race-bottom-grid { grid-template-columns: 1fr; }
-    }
-    .question-card-live {
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    .question-title-text {
       font-family: var(--font-title);
-      font-size: 1.3rem;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-    .options-live-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .opt-live-btn {
-      background: #0e1526;
-      border: 2px solid rgba(255,255,255,0.12);
-      border-radius: 12px;
-      padding: 12px 16px;
+      font-weight: 800;
       font-size: 0.95rem;
-      color: #f1f2f6;
-      cursor: pointer;
-      text-align: left;
-      display: flex;
+      background: rgba(30, 144, 255, 0.18);
+      border: 1px solid rgba(30, 144, 255, 0.4);
+      color: var(--cyan);
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-      font-family: var(--font-body);
-      transition: all 0.15s;
-    }
-    .opt-live-btn:hover:not(:disabled) {
-      background: #17223b;
-      border-color: #3742fa;
-    }
-    .opt-live-btn.correct {
-      background: rgba(46, 213, 115, 0.2) !important;
-      border-color: #2ed573 !important;
-      color: #2ed573 !important;
-    }
-    .opt-live-btn.wrong {
-      background: rgba(255, 71, 87, 0.2) !important;
-      border-color: #ff4757 !important;
-      color: #ff4757 !important;
+      gap: 6px;
     }
 
     /* STUDENT CONTROLLER VIEW (ON PHONE) */
@@ -438,60 +373,101 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .player-hero-card {
       background: var(--bg-card);
       border: 2px solid var(--gold);
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-    .player-rank-large {
-      font-family: var(--font-arcade);
-      font-size: 1.6rem;
-      color: var(--gold);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
     }
     .player-item-trigger {
       background: #0b111e;
-      border: 3px solid var(--accent);
+      border: 2px dashed rgba(255,255,255,0.25);
       border-radius: 14px;
-      padding: 14px;
+      padding: 12px;
       text-align: center;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #fff;
       transition: all 0.2s;
     }
-    .player-item-trigger:hover { transform: scale(1.03); box-shadow: 0 0 20px var(--accent); }
+    .player-item-trigger.has-item {
+      background: linear-gradient(135deg, rgba(255, 165, 2, 0.25), rgba(255, 71, 87, 0.25));
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 20px rgba(255, 165, 2, 0.6);
+      animation: pulseGlow 1.2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { transform: scale(1); box-shadow: 0 0 15px rgba(255, 165, 2, 0.5); }
+      to { transform: scale(1.02); box-shadow: 0 0 25px rgba(255, 165, 2, 0.9); }
+    }
 
-    /* LEADERBOARD PANEL */
-    .leaderboard-panel {
+    .question-card-live {
       background: var(--bg-card);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 16px;
-      padding: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+    .options-live-grid {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      margin-bottom: 12px;
     }
+    .opt-live-btn {
+      background: #0e1526;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      color: #f1f2f6;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-body);
+      transition: all 0.15s;
+      width: 100%;
+    }
+    .opt-live-btn:hover:not(:disabled) {
+      background: #17223b;
+      border-color: #3742fa;
+    }
+    .opt-live-btn.correct {
+      background: rgba(46, 213, 115, 0.3) !important;
+      border-color: #2ed573 !important;
+      color: #2ed573 !important;
+      box-shadow: 0 0 18px rgba(46, 213, 115, 0.5);
+    }
+    .opt-live-btn.wrong {
+      background: rgba(255, 71, 87, 0.3) !important;
+      border-color: #ff4757 !important;
+      color: #ff4757 !important;
+    }
+
+    /* LEADERBOARD ITEM */
     .live-ranking-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #0c1221;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 0.82rem;
+      background: rgba(12, 18, 33, 0.9);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.84rem;
       border-left: 4px solid #fff;
+      transition: transform 0.2s;
     }
+    .live-ranking-item:hover { transform: translateX(2px); }
 
     /* MODALS */
     .modal-backdrop {
@@ -519,83 +495,61 @@
       overflow-y: auto;
     }
 
-    /* ITEM GUIDE GRID */
-    .item-guide-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin: 16px 0;
-    }
-    @media (max-width: 600px) {
-      .item-guide-grid { grid-template-columns: 1fr; }
-    }
-    .item-guide-row {
-      background: #0a0f1c;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .item-guide-emoji { font-size: 2rem; flex-shrink: 0; }
-    .item-guide-info strong { display: block; font-size: 0.9rem; color: var(--gold); margin-bottom: 2px; }
-    .item-guide-info p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; }
-
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none;
-      z-index: 400;
-    }
-
     @keyframes pulseDot {
-      0% { opacity: 0.4; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1.2); }
+      from { opacity: 0.3; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
     }
   </style>
 </head>
 <body>
 
-  <!-- ==================== HEADER ==================== -->
+  <!-- HEADER -->
   <header class="gp-header">
     <div class="header-branding">
       <div class="cios-logo-badge">
-        <img src="data:image/png;base64,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" alt="CIOS Zuidwest-NL Logo" class="cios-logo-img" id="cios-logo">
+        <img src="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" alt="CIOS Scalda" class="cios-logo-img">
       </div>
       <div class="brand-title">
-        <h1><span>&#x1F3CE;&#xFE0F;</span> GLOBETROTTER GP <span>&#x1F3C1;</span></h1>
-        <span>Live Mario Kart Stage Race | Digibord &amp; Studenten</span>
+        <h1><i class="fa-solid fa-flag-checkered"></i> GLOBETROTTER CIOS</h1>
+        <span>Mario Kart Grand Prix Live &bull; Keuzedeel IBPV 2627</span>
       </div>
     </div>
+
     <div class="header-actions">
-      <button class="header-btn" id="open-item-guide-btn" title="Bekijk werking van alle Mario Kart items!">
-        <i class="fa-solid fa-book-open text-warning"></i> Item Gids
+      <button class="header-btn" id="open-item-guide-btn" title="Mario Kart Spelregels &amp; Power-ups">
+        <i class="fa-solid fa-book-open text-warning"></i> Spelregels
       </button>
-      <button class="header-btn" id="audio-toggle-btn" title="Geluid Aan/Uit">
-        <i class="fa-solid fa-volume-high"></i> Geluid: <span id="sound-status">Aan</span>
+      <button class="header-btn" id="audio-toggle-btn" title="Geluid AAN/UIT">
+        <i class="fa-solid fa-volume-high"></i> <span id="sound-status">Aan</span>
       </button>
-      <button class="header-btn" id="editor-open-btn" title="Vragen &amp; Landen Aanpassen">
-        <i class="fa-solid fa-sliders"></i> Vragen Beheer
+      <button class="header-btn" id="editor-open-btn" title="Vragen &amp; Landen Bewerken">
+        <i class="fa-solid fa-pen-to-square"></i> Vragen
       </button>
-      <button class="header-btn" id="fullscreen-btn" title="Volledig Scherm (Digibord)">
-        <i class="fa-solid fa-expand"></i> Scherm
+      <button class="header-btn" id="fullscreen-btn" title="Volledig scherm">
+        <i class="fa-solid fa-expand"></i>
       </button>
-      <button class="header-btn" id="restart-game-btn" title="Reset Spel">
-        <i class="fa-solid fa-rotate-right"></i> Reset
+      <button class="header-btn" id="restart-game-btn" title="Herstart Spel">
+        <i class="fa-solid fa-rotate-right"></i>
       </button>
     </div>
   </header>
 
-  <audio id="mario-kart-bgm" loop preload="auto" src="https://ia800108.us.archive.org/27/items/mario-kart-64-original-sound-track/03%20Raceways.mp3"></audio>
-  <canvas id="confetti-canvas"></canvas>
-
+  <!-- MAIN CONTAINER -->
   <div class="container">
-
-    <!-- ROLE SWITCHER (Bovenaan) -->
+    
+    <!-- Role Switcher -->
     <div class="role-bar" id="role-selector-bar">
-      <button class="role-pill active" id="role-host-btn"><i class="fa-solid fa-tv"></i> Docent (Digibord Scherm)</button>
-      <button class="role-pill" id="role-player-btn"><i class="fa-solid fa-mobile-screen"></i> Student (Speel mee op Mobiel/Laptop)</button>
+      <div class="role-pill active" id="role-host-btn"><i class="fa-solid fa-chalkboard-user"></i> Docent Digibord Weergave</div>
+      <div class="role-pill" id="role-player-btn"><i class="fa-solid fa-mobile-screen"></i> Student Telefoon Controller</div>
     </div>
 
     <!-- ==================== SCREEN 1A: DOCENT DIGIBORD LOBBY ==================== -->
@@ -617,20 +571,20 @@
           </div>
 
           <div class="form-group">
-            <label for="race-rounds">Race Lengte (Aantal Checkpoints/Rondes):</label>
+            <label for="race-rounds">Race Doel (Aantal Goede Antwoorden):</label>
             <select id="race-rounds" class="form-select">
-              <option value="6">&#x1F3C1; Sprint Race (6 Checkpoints - ca. 15 min)</option>
-              <option value="10" selected>&#x1F3C6; Standaard Grand Prix (10 Checkpoints - ca. 25 min)</option>
-              <option value="16">&#x1F525; Endurance Grand Prix (16 Checkpoints - ca. 40 min)</option>
+              <option value="15" selected>ðŸ Grand Prix: Eerste team met 15 goede antwoorden wint!</option>
+              <option value="10">âš¡ Snelle Sprint: Eerste team met 10 goede antwoorden wint</option>
+              <option value="20">ðŸ”¥ Endurance Race: Eerste team met 20 goede antwoorden wint</option>
             </select>
           </div>
 
           <div class="form-group">
             <label>Mario Kart Speciale Regels:</label>
             <div style="display:flex; flex-direction:column; gap:8px; font-size:0.86rem; color:#dcdde1; margin-top:4px;">
-              <label><input type="checkbox" id="rule-items" checked> &#x1F344; Mario Kart Items (Paddenstoel, Banaan, Schild, Ster)</label>
-              <label><input type="checkbox" id="rule-blueshell" checked> &#x1F422;&#x1F499; Blue Shell Catch-up (P7-P12 kan koploper afremmen!)</label>
-              <label><input type="checkbox" id="rule-jokers" checked> &#x1F6E0;&#xFE0F; Pitstop Jokers (50/50 &amp; Bandenwissel extra tijd)</label>
+              <label><input type="checkbox" id="rule-items" checked> &#x1F344; Mario Kart Items (Paddenstoel, Banaan, Schild, Blauwe Schild, Ster)</label>
+              <label><input type="checkbox" id="rule-blueshell" checked> &#x1F422;&#x1F499; Blue Shell Catch-up (P7-P12 kan de koploper afremmen!)</label>
+              <label><input type="checkbox" id="rule-jokers" checked> &#x1F6E0;&#xFE0F; Pitstop Jokers (50/50 &amp; Hint)</label>
             </div>
           </div>
 
@@ -687,29 +641,29 @@
 
     <!-- ==================== SCREEN 1B: STUDENT CONTROLLER LOBBY ==================== -->
     <section id="player-lobby-screen" class="screen">
-      <div class="student-join-box">
+      <div style="max-width:500px; margin:0 auto; width:100%; background:var(--bg-card); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.6);">
         <h2 style="font-family:var(--font-title); font-size:1.4rem; color:#fff; text-align:center; margin-bottom:6px;">
           <i class="fa-solid fa-flag-checkered text-danger"></i> Doe Mee aan de Race! <i class="fa-solid fa-flag-checkered text-danger"></i>
         </h2>
         <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:20px;">
-          Vul je naam in, kies je Mario Kart avatar en race live mee tegen je klasgenoten!
+          Vul je duo-naam in, kies je Mario Kart karakter en race live mee via je telefoon!
         </p>
 
         <input type="hidden" id="player-pin-input" value="CIOS-2627">
 
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom:14px;">
           <label for="player-name-input">Jouw Naam / Duo Naam:</label>
           <input type="text" id="player-name-input" class="form-input" placeholder="bijv. Daan &amp; Sophie" autocomplete="off">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom:18px;">
           <label>Kies jouw Mario Kart Karakter:</label>
           <div class="avatar-picker-grid" id="avatar-picker-grid">
-            <!-- Dynamisch gevuld met 10+ Mario Kart karakters -->
+            <!-- Dynamically populated with 11 Mario Kart characters -->
           </div>
         </div>
 
-        <button id="player-join-btn" class="start-race-btn">
+        <button id="player-join-btn" class="start-race-btn" style="width:100%;">
           <i class="fa-solid fa-right-to-bracket"></i> AANMELDEN VOOR DE RACE !
         </button>
       </div>
@@ -720,77 +674,65 @@
       
       <!-- Top info bar -->
       <div class="arena-topbar">
-        <div style="display:flex; align-items:center; gap:10px; font-family:var(--font-arcade); font-size:0.9rem; color:var(--gold);">
-          <i class="fa-solid fa-flag-checkered"></i>
-          <span>CHECKPOINT <span id="arena-current-lap">1</span> / <span id="arena-total-laps">10</span></span>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div style="font-family:var(--font-arcade); font-size:0.95rem; color:var(--gold); display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-flag-checkered text-danger"></i>
+            <span>GRAND PRIX: <span id="arena-race-goal-tag">EERSTE MET 15 GOED WINT!</span></span>
+          </div>
+          <div class="checkpoint-tag" id="arena-circuit-tag">
+            ðŸŒ Wereldkampioenschap
+          </div>
         </div>
-        <div class="checkpoint-tag" id="arena-checkpoint-tag">
-          &#x1F30D; Nederland - Start &amp; Kick-off
-        </div>
-        <div style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;" id="arena-player-count-tag">
-          12 Racers op de baan
+        
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;" id="arena-player-count-tag">
+            12 Racers op de baan
+          </div>
+          <!-- Camera Toggle -->
+          <button id="toggle-cam-mode-btn" class="header-btn" style="padding:6px 12px; font-size:0.75rem;" title="Wissel camerastandpunt">
+            <i class="fa-solid fa-video text-warning"></i> <span id="cam-mode-label">Cam: Actie Chase</span>
+          </button>
+          <!-- 3D / 2D View Mode Toggle -->
+          <button id="toggle-view-mode-btn" class="header-btn" style="padding:6px 12px; font-size:0.75rem;" title="Wissel tussen 3D Mario Kart Arena en 2D Baanoverzicht">
+            <i class="fa-solid fa-cube text-cyan"></i> <span id="view-mode-label">3D Arena</span>
+          </button>
+          <!-- Manual Finish -->
+          <button id="arena-finish-manual-btn" class="header-btn" style="padding:6px 12px; font-size:0.75rem; background:rgba(255,71,87,0.2); border-color:#ff4757;" title="Race afronden en uitslag tonen">
+            <i class="fa-solid fa-flag-checkered"></i> Finish
+          </button>
         </div>
       </div>
 
-      <!-- 3D & 2D MARIO KART CIRCUIT ARENA -->
-      <div class="track-canvas-container" style="position:relative; height:400px;">
-        <!-- 3D / 2D View Mode Toggle -->
-        <button id="toggle-view-mode-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.25); color:#fff; font-size:0.75rem; padding:6px 14px; border-radius:20px; cursor:pointer;" title="Wissel tussen 3D Mario Kart Arena en 2D Baanoverzicht">
-          <i class="fa-solid fa-cube text-warning"></i> <span id="view-mode-label">Weergave: <strong>3D Arena</strong></span>
-        </button>
-
+      <!-- 3D & 2D MARIO KART CIRCUIT ARENA (EXPANDED TO FULL VIEW: 580PX) -->
+      <div class="track-canvas-container" style="position:relative; height:580px; border-radius:18px; overflow:hidden; border:2px solid rgba(255,255,255,0.15); box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+        
         <!-- 3D WebGL Three.js Scene -->
         <div id="three-track-container" style="width:100%; height:100%; position:absolute; top:0; left:0;"></div>
 
         <!-- 2D Canvas Fallback -->
-        <canvas id="race-canvas" width="1200" height="400" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
-      </div>
+        <canvas id="race-canvas" width="1200" height="580" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
 
-      <!-- Bottom Grid: Current Question + Live Leaderboard -->
-      <div class="race-bottom-grid">
-        
-        <!-- Live Question on Digibord -->
-        <div class="question-card-live">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-            <span style="font-size:0.88rem; font-weight:800; color:var(--cyan);" id="arena-q-topic">
-              &#x1F30D; Spanje | Didactiek &amp; Omgangsvormen
-            </span>
-            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-              <span id="arena-answers-count" style="font-size:0.82rem; color:var(--text-muted); font-weight:700; background:rgba(255,255,255,0.08); padding:4px 10px; border-radius:12px;">
-                <i class="fa-solid fa-users"></i> 0 antwoorden binnen
-              </span>
-              <div style="display:flex; align-items:center; gap:4px; font-family:var(--font-arcade); font-size:1.1rem; color:var(--gold);">
-                <i class="fa-regular fa-clock" style="font-size:0.9rem;"></i>
-                <span id="arena-timer-num">25</span>s
-              </div>
-              <button id="arena-skip-timer-btn" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:bold; cursor:pointer;" title="Sluit vraag direct en toon uitslag">
-                <i class="fa-solid fa-forward-step"></i> Sluit Vraag
-              </button>
+        <!-- FLOATING OVERLAY: MARIO KART LIVE LEADERBOARD (Top-Right) -->
+        <div id="arena-floating-leaderboard" style="position:absolute; top:16px; right:16px; z-index:25; width:320px; max-width:90%; background:rgba(15, 23, 42, 0.88); backdrop-filter:blur(12px); border:1px solid rgba(255, 255, 255, 0.2); border-radius:16px; padding:14px; box-shadow:0 12px 30px rgba(0,0,0,0.6);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:8px; margin-bottom:10px;">
+            <div style="font-family:var(--font-arcade); font-size:0.78rem; color:var(--gold); display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-trophy"></i> LIVE KLASSEMENT
             </div>
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;" id="arena-total-laps-tag">Doel: 15 Goed</span>
           </div>
-
-          <div class="question-title-text" id="arena-question-text">
-            Vraag wordt ingeladen...
-          </div>
-
-          <div class="options-live-grid" id="arena-options-container">
-            <!-- A, B, C buttons -->
-          </div>
-
-          <!-- Live Event Feed below Question -->
-          <div style="background:#090e18; border-radius:8px; padding:8px 12px; font-size:0.78rem; border:1px solid rgba(255,255,255,0.06); height:65px; overflow-y:auto;" id="arena-event-feed">
-            <div style="color:var(--text-muted);">&#x1F3C1; De lichten springen op groen!</div>
+          <div id="arena-ranking-list" style="display:flex; flex-direction:column; gap:6px; max-height:280px; overflow-y:auto; padding-right:4px;">
+            <!-- Dynamically populated with racers -->
           </div>
         </div>
 
-        <!-- Leaderboard -->
-        <div class="leaderboard-panel">
-          <h3 style="font-family:var(--font-title); font-size:1rem; color:#fff; display:flex; justify-content:space-between;">
-            <span><i class="fa-solid fa-trophy text-warning"></i> Live Klassement</span>
-            <span style="font-size:0.75rem; color:var(--text-muted);" id="arena-leader-tag">P1: Mario</span>
-          </h3>
-          <div style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto;" id="arena-ranking-list">
-            <!-- Dynamic list of racers sorted by progress -->
+        <!-- FLOATING OVERLAY: RACE EVENT COMMENTARY TICKER (Bottom) -->
+        <div id="arena-event-ticker" style="position:absolute; bottom:14px; left:16px; right:16px; z-index:25; background:rgba(9, 14, 24, 0.92); backdrop-filter:blur(10px); border:1px solid rgba(255, 255, 255, 0.18); border-radius:14px; padding:10px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 8px 24px rgba(0,0,0,0.7);">
+          <div style="display:inline-flex; align-items:center; gap:6px; background:#ff4757; color:#fff; font-family:var(--font-arcade); font-size:0.68rem; padding:4px 8px; border-radius:6px; flex-shrink:0;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block; animation:pulseDot 0.8s infinite alternate;"></span>
+            LIVE
+          </div>
+          <div id="arena-event-feed-text" style="font-size:0.86rem; font-weight:700; color:#f1f2f6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+            ðŸ De Grand Prix gaat van start! Eerste team met 15 goede antwoorden wint de beker!
           </div>
         </div>
 
@@ -804,37 +746,56 @@
         
         <!-- Status card -->
         <div class="player-hero-card">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:2.2rem;" id="player-card-emoji">&#x1F344;</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:2.4rem;" id="player-card-emoji">&#x1F344;</span>
             <div>
-              <strong style="font-size:1.1rem; color:#fff;" id="player-card-name">Student Naam</strong>
-              <div style="font-size:0.75rem; color:var(--text-muted);" id="player-card-character">Mario</div>
+              <strong style="font-size:1.15rem; color:#fff; display:block;" id="player-card-name">Student Naam</strong>
+              <div style="font-size:0.75rem; color:var(--cyan); font-weight:700;" id="player-card-character">Mario</div>
             </div>
           </div>
           <div style="text-align:right;">
-            <div class="player-rank-large" id="player-card-rank">P1</div>
-            <span style="font-size:0.75rem; color:var(--accent);" id="player-card-progress">25% van de baan</span>
+            <div class="player-rank-large" id="player-card-rank" style="font-family:var(--font-arcade); font-size:1.6rem; color:var(--gold);">P1</div>
+            <div style="font-size:0.8rem; font-weight:800; color:var(--accent); margin-top:2px;" id="player-card-progress">0 / 15 Goed</div>
           </div>
+        </div>
+
+        <!-- Progress bar toward 15 -->
+        <div style="width:100%; height:10px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.15);">
+          <div id="player-progress-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #2ed573, #ffa502); transition:width 0.4s ease-out;"></div>
         </div>
 
         <!-- Mario Kart Special Item Trigger Box for Student -->
-        <div class="player-item-trigger" id="player-item-btn" style="cursor:pointer; background:linear-gradient(135deg, #1e293b, #0f172a); border:2px dashed rgba(255,255,255,0.25); border-radius:14px; padding:12px; display:flex; align-items:center; justify-content:center; gap:12px; transition:all 0.25s;">
+        <div class="player-item-trigger" id="player-item-btn">
           <span style="font-size:2.2rem; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));" id="player-item-emoji">&#x2753;</span>
           <div style="text-align:left;">
-            <div style="font-family:var(--font-arcade); font-size:0.85rem; color:var(--gold); letter-spacing:0.5px;" id="player-item-header">SPECIALE ITEM BOX</div>
-            <span id="player-item-text" style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Beantwoord vragen snel goed om items te winnen!</span>
+            <div style="font-family:var(--font-arcade); font-size:0.82rem; color:var(--gold); letter-spacing:0.5px;" id="player-item-header">SPECIALE ITEM BOX</div>
+            <span id="player-item-text" style="font-size:0.78rem; color:var(--text-muted); font-weight:600;">Beantwoord vragen snel goed om items te winnen!</span>
           </div>
         </div>
 
-        <!-- Question View for Student -->
-        <div class="question-card-live" style="margin-top:8px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-            <span style="font-size:0.85rem; font-weight:bold; color:var(--cyan);" id="player-q-country">Spanje</span>
-            <span style="font-family:var(--font-arcade); font-size:0.95rem; color:var(--gold);" id="player-timer-text">25s</span>
+        <!-- Waiting Card Before Game Starts -->
+        <div id="player-waiting-box" style="text-align:center; padding:30px 16px; background:var(--bg-card); border:1px solid rgba(255,255,255,0.12); border-radius:16px;">
+          <div style="font-size:3rem; margin-bottom:12px; animation:bounce 1.5s infinite;">ðŸŽï¸</div>
+          <h3 style="font-family:var(--font-title); font-size:1.25rem; color:#fff; margin-bottom:6px;">Je staat op de startgrid!</h3>
+          <p style="font-size:0.88rem; color:var(--text-muted);">Wachten tot de docent op het digibord op START drukt...</p>
+        </div>
+
+        <!-- Active Question View for Student -->
+        <div class="question-card-live" id="player-active-q-box" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.85rem; font-weight:bold; color:var(--cyan);" id="player-q-country">&#x1F30D; Nederland</span>
+            <span style="font-family:var(--font-arcade); font-size:0.8rem; color:var(--gold);" id="player-q-lap-badge">VRAAG 1 / 15</span>
           </div>
 
-          <div style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:14px;" id="player-q-prompt">
-            Vraag verschijnt hier zodra de Grand Prix start...
+          <div style="font-size:1.08rem; font-weight:700; line-height:1.45; color:#fff; margin-bottom:14px;" id="player-q-prompt">
+            Vraagtekst...
+          </div>
+
+          <!-- Slip Penalty Overlay -->
+          <div id="player-slip-penalty" style="display:none; background:rgba(255,71,87,0.25); border:2px solid #ff4757; border-radius:12px; padding:12px; text-align:center; margin-bottom:12px; animation:shake 0.4s;">
+            <div style="font-size:1.8rem;">ðŸŒ</div>
+            <strong style="color:#ff4757; font-size:0.95rem;">FOUT ANTWOORD! 360Â° BANANENSLIP!</strong>
+            <div style="font-size:0.8rem; color:#fff; margin-top:2px;">2 seconden straftijd...</div>
           </div>
 
           <div class="options-live-grid" id="player-options-grid">
@@ -843,13 +804,21 @@
 
           <!-- Student Pitstop Jokers -->
           <div style="display:flex; gap:10px; margin-top:14px;">
-            <button id="player-joker-5050" class="secondary-btn" style="flex:1; padding:9px 6px; font-size:0.75rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; cursor:pointer;">
+            <button id="player-joker-5050" class="header-btn" style="flex:1; justify-content:center; padding:10px 6px; font-size:0.75rem;">
               <i class="fa-solid fa-wand-magic-sparkles text-warning"></i> 50/50 Joker
             </button>
-            <button id="player-joker-time" class="secondary-btn" style="flex:1; padding:9px 6px; font-size:0.75rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; cursor:pointer;">
-              <i class="fa-solid fa-stopwatch text-cyan"></i> +20s Joker
+            <button id="player-joker-hint" class="header-btn" style="flex:1; justify-content:center; padding:10px 6px; font-size:0.75rem;">
+              <i class="fa-solid fa-lightbulb text-cyan"></i> Tip / Hint
             </button>
           </div>
+        </div>
+
+        <!-- Student Victory Card -->
+        <div id="player-winner-box" style="display:none; text-align:center; padding:35px 20px; background:linear-gradient(135deg, rgba(255,165,2,0.2), rgba(46,213,115,0.2)); border:2px solid var(--gold); border-radius:18px;">
+          <div style="font-size:4rem; margin-bottom:10px;">ðŸ†</div>
+          <h2 style="font-family:var(--font-title); font-size:1.8rem; color:var(--gold); margin-bottom:8px;">GEFELICITEERD!</h2>
+          <p style="font-size:1rem; color:#fff; font-weight:700; margin-bottom:12px;">Je hebt alle 15 vragen goed beantwoord!</p>
+          <div style="font-size:0.85rem; color:var(--text-muted);">Kijk op het grote Digibord voor het officiÃ«le Mario Kart podium en de ceremonie!</div>
         </div>
 
       </div>
@@ -925,84 +894,31 @@
         Bij elk goed en snel antwoord maken studenten kans op een officieel Mario Kart item in hun inventaris. Tik op het item op je telefoonscherm om het tactisch in te zetten!
       </p>
 
-      <div class="item-guide-grid">
-        
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F344;</span>
-          <div class="item-guide-info">
-            <strong>Turbo Paddenstoel (Mushroom Boost)</strong>
-            <p>Geeft de kart direct <strong>+200 meter extra turbo sprint</strong> en schiet met vlammen vooruit op het circuit!</p>
-          </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;">
+        <div style="display:flex; gap:10px; background:rgba(0,0,0,0.25); padding:10px; border-radius:10px;">
+          <span style="font-size:2rem;">ðŸ„</span>
+          <div style="font-size:0.82rem;"><strong>Turbo Paddenstoel</strong><br>Geeft direct een enorme turbo boost voorwaarts!</div>
         </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F34C;</span>
-          <div class="item-guide-info">
-            <strong>Bananenschil (Banana Hazard)</strong>
-            <p>Laat een directe concurrent slippen! Het slachtoffer maakt een <strong>360&deg; slip</strong> en verliest 100m voorsprong.</p>
-          </div>
+        <div style="display:flex; gap:10px; background:rgba(0,0,0,0.25); padding:10px; border-radius:10px;">
+          <span style="font-size:2rem;">ðŸŒ</span>
+          <div style="font-size:0.82rem;"><strong>Bananenschil</strong><br>Laat een concurrent 360Â° slippen met 2 sec vertraging!</div>
         </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F422;</span>
-          <div class="item-guide-info">
-            <strong>Groen Schild (Green Shell)</strong>
-            <p>Wordt naar voren afgevuurd en schakelt de kart direct v&oacute;&oacute;r je uit voor een directe inhaalactie.</p>
-          </div>
+        <div style="display:flex; gap:10px; background:rgba(0,0,0,0.25); padding:10px; border-radius:10px;">
+          <span style="font-size:2rem;">ðŸ¢</span>
+          <div style="font-size:0.82rem;"><strong>Groen Schild</strong><br>Vuurt af op de racer voor je en schakelt deze even uit!</div>
         </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F422;&#x1F499;</span>
-          <div class="item-guide-info">
-            <strong>Blauw Schild (Blue Shell Catch-Up)</strong>
-            <p>Exclusief voor studenten die achterin liggen (P7-P12)! Vliegt automatisch over de baan naar de <strong>nummer 1</strong> en remt de leider fors af.</p>
-          </div>
+        <div style="display:flex; gap:10px; background:rgba(0,0,0,0.25); padding:10px; border-radius:10px;">
+          <span style="font-size:2rem;">ðŸ¢ðŸ’™</span>
+          <div style="font-size:0.82rem;"><strong>Blauw Schild</strong><br>Vliegt direct naar de koploper (P1) en remt deze fors af!</div>
         </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F31F;</span>
-          <div class="item-guide-info">
-            <strong>Ster (Star Power)</strong>
-            <p>Maakt de kart <strong>onkwetsbaar</strong> en geeft <strong>dubbele snelheid</strong> voor de komende 2 bochten!</p>
-          </div>
+        <div style="display:flex; gap:10px; background:rgba(0,0,0,0.25); padding:10px; border-radius:10px;">
+          <span style="font-size:2rem;">â­</span>
+          <div style="font-size:0.82rem;"><strong>Star Power</strong><br>Onkwetsbaar voor aanvallen en tijdelijk dubbele turbo!</div>
         </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x1F6E0;&#xFE0F;</span>
-          <div class="item-guide-info">
-            <strong>Pitstop 50/50 Joker</strong>
-            <p>Hulplijn voor lastige vragen: streept direct 1 fout antwoord weg.</p>
-          </div>
-        </div>
-
-        <div class="item-guide-row">
-          <span class="item-guide-emoji">&#x23F1;&#xFE0F;</span>
-          <div class="item-guide-info">
-            <strong>Bandenwissel (+20 sec)</strong>
-            <p>Geeft 20 seconden extra rust en bedenktijd om met je duo te overleggen.</p>
-          </div>
-        </div>
-
       </div>
 
-      <button class="start-race-btn" id="guide-understood-btn" style="padding:12px;">
+      <button class="start-race-btn" id="guide-understood-btn" style="padding:12px; width:100%;">
         IK SNAP HET, TERUG NAAR DE RACE!
-      </button>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL: FEEDBACK OVERLAY ==================== -->
-  <div class="modal-backdrop" id="feedback-modal">
-    <div class="modal-card" style="max-width:550px; text-align:center;">
-      <div style="font-size:3.5rem; margin-bottom:10px;" id="feedback-icon">&#x1F389;</div>
-      <h2 style="font-family:var(--font-title); font-size:1.6rem; font-weight:900; margin-bottom:10px;" id="feedback-title">
-        SUPER TURBO SPRINT!
-      </h2>
-      <div style="font-size:0.95rem; color:#d1d8e0; line-height:1.5; margin-bottom:20px; background:rgba(0,0,0,0.3); padding:14px; border-radius:10px; text-align:left;" id="feedback-text">
-        Toelichting komt hier te staan.
-      </div>
-      <button class="start-race-btn" id="feedback-next-btn" style="padding:12px;">
-        VOLGENDE BOCHT <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>
@@ -2000,26 +1916,26 @@ const QUESTIONS = {
     // OFFICIAL MARIO KART CHARACTERS (11 Racers)
     // ==========================================
     const MARIO_KART_CHARACTERS = [
-      { id: 'mario', name: 'Mario', emoji: '\u{1F344}', color: '#ef4444', desc: 'All-Rounder' },
-      { id: 'luigi', name: 'Luigi', emoji: '\u{1F3CE}\u{FE0F}', color: '#10b981', desc: 'Precision Drifter' },
-      { id: 'peach', name: 'Peach', emoji: '\u{1F451}', color: '#ec4899', desc: 'Smooth Handling' },
-      { id: 'yoshi', name: 'Yoshi', emoji: '\u{1F95A}', color: '#84cc16', desc: 'Quick Acceleration' },
-      { id: 'bowser', name: 'Bowser', emoji: '\u{1F422}', color: '#ea580c', desc: 'Heavyweight Tank' },
-      { id: 'toad', name: 'Toad', emoji: '\u{26A1}', color: '#3b82f6', desc: 'Light & Nimble' },
-      { id: 'donkeykong', name: 'Donkey Kong', emoji: '\u{1F435}', color: '#b45309', desc: 'Banana Master' },
-      { id: 'wario', name: 'Wario', emoji: '\u{1F4B0}', color: '#eab308', desc: 'Bulldozer Grip' },
-      { id: 'waluigi', name: 'Waluigi', emoji: '\u{1F3BE}', color: '#8b5cf6', desc: 'Sneaky Tactician' },
-      { id: 'rosalina', name: 'Rosalina', emoji: '\u{2728}', color: '#06b6d4', desc: 'Cosmic Cruiser' },
-      { id: 'daisy', name: 'Daisy', emoji: '\u{1F33C}', color: '#f59e0b', desc: 'Energetic Striker' }
+      { id: 'mario', name: 'Mario', emoji: 'ðŸ„', color: '#ef4444', desc: 'All-Rounder' },
+      { id: 'luigi', name: 'Luigi', emoji: 'ðŸŽï¸', color: '#10b981', desc: 'Precision Drifter' },
+      { id: 'peach', name: 'Peach', emoji: 'ðŸ‘‘', color: '#ec4899', desc: 'Smooth Handling' },
+      { id: 'yoshi', name: 'Yoshi', emoji: 'ðŸ¥š', color: '#84cc16', desc: 'Quick Acceleration' },
+      { id: 'bowser', name: 'Bowser', emoji: 'ðŸ¢', color: '#ea580c', desc: 'Heavyweight Tank' },
+      { id: 'toad', name: 'Toad', emoji: 'âš¡', color: '#3b82f6', desc: 'Light & Nimble' },
+      { id: 'donkeykong', name: 'Donkey Kong', emoji: 'ðŸµ', color: '#b45309', desc: 'Banana Master' },
+      { id: 'wario', name: 'Wario', emoji: 'ðŸ’°', color: '#eab308', desc: 'Bulldozer Grip' },
+      { id: 'waluigi', name: 'Waluigi', emoji: 'ðŸŽ¾', color: '#8b5cf6', desc: 'Sneaky Tactician' },
+      { id: 'rosalina', name: 'Rosalina', emoji: 'âœ¨', color: '#06b6d4', desc: 'Cosmic Cruiser' },
+      { id: 'daisy', name: 'Daisy', emoji: 'ðŸŒ¼', color: '#f59e0b', desc: 'Energetic Striker' }
     ];
 
     // MARIO KART POWER-UPS
     const POWER_UPS = [
-      { id: 'mushroom', name: 'Turbo Paddenstoel', emoji: '\u{1F344}', desc: '+200m Turbo Sprint!' },
-      { id: 'banana', name: 'Bananenschil', emoji: '\u{1F34C}', desc: 'Laat een concurrent 360\u00B0 slippen (-100m)!' },
-      { id: 'shell', name: 'Groen Schild', emoji: '\u{1F422}', desc: 'Directe inhaalslag op je voorligger!' },
-      { id: 'blueshell', name: 'Blauwe Schild', emoji: '\u{1F422}\u{1F499}', desc: 'Target de koploper en schakel diens voorsprong terug!' },
-      { id: 'star', name: 'Star Power', emoji: '\u{1F31F}', desc: 'Onkwetsbaar + dubbele snelheid!' }
+      { id: 'mushroom', name: 'Turbo Paddenstoel', emoji: 'ðŸ„', desc: '+15% Turbo Sprint!' },
+      { id: 'banana', name: 'Bananenschil', emoji: 'ðŸŒ', desc: 'Laat een concurrent 360Â° slippen!' },
+      { id: 'shell', name: 'Groen Schild', emoji: 'ðŸ¢', desc: 'Directe inhaalslag op je voorligger!' },
+      { id: 'blueshell', name: 'Blauwe Schild', emoji: 'ðŸ¢ðŸ’™', desc: 'Target de koploper en rem deze af!' },
+      { id: 'star', name: 'Star Power', emoji: 'â­', desc: 'Onkwetsbaar + dubbele turbo!' }
     ];
 
     // ==========================================
@@ -2027,6 +1943,8 @@ const QUESTIONS = {
     // ==========================================
     let audioCtx = null;
     let soundEnabled = true;
+    let bgmAudio = null;
+    let bgmSynthInterval = null;
 
     function initAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2058,159 +1976,115 @@ const QUESTIONS = {
         case 'correct':
           playTone(523, 'triangle', 0.08, 0.2);
           setTimeout(() => playTone(659, 'triangle', 0.08, 0.2), 70);
-          setTimeout(() => playTone(784, 'triangle', 0.25, 0.25), 140);
+          setTimeout(() => playTone(784, 'triangle', 0.22, 0.25), 140);
           break;
         case 'wrong':
           playTone(220, 'sawtooth', 0.18, 0.25);
           setTimeout(() => playTone(165, 'sawtooth', 0.35, 0.25), 150);
           break;
         case 'turbo':
-          for (let i = 0; i < 8; i++) setTimeout(() => playTone(300 + i * 80, 'sawtooth', 0.05, 0.15), i * 30);
+          for (let i = 0; i < 6; i++) {
+            setTimeout(() => playTone(300 + i * 110, 'sawtooth', 0.08, 0.2), i * 35);
+          }
           break;
         case 'slip':
-          for (let i = 0; i < 6; i++) setTimeout(() => playTone(800 - i * 90, 'sine', 0.05, 0.2), i * 40);
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => playTone(600 - i * 80, 'sine', 0.07, 0.25), i * 40);
+          }
           break;
-        case 'blueshell':
-          playTone(350, 'sawtooth', 0.2, 0.2);
-          setTimeout(() => playTone(700, 'square', 0.4, 0.3), 200);
+        case 'shell':
+          playTone(350, 'square', 0.1, 0.2);
+          setTimeout(() => playTone(700, 'square', 0.2, 0.25), 90);
           break;
-        case 'victory':
-          [523, 659, 784, 1046].forEach((n, idx) => setTimeout(() => playTone(n, 'triangle', 0.2, 0.25), idx * 120));
+        case 'fanfare':
+          const notes = [523, 659, 784, 1046];
+          notes.forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.35, 0.28), i * 160));
           break;
       }
     }
-
-    // ==========================================
-    // MARIO KART RACE SOUNDTRACK (BGM)
-    // ==========================================
-    let bgmInterval = null;
-    let bgmStep = 0;
 
     function startRaceBGM() {
       if (!soundEnabled) return;
-      initAudio();
-      stopRaceBGM();
-
-      const audioEl = document.getElementById('mario-kart-bgm');
-      if (audioEl) {
-        audioEl.volume = 0.4;
-        const playPromise = audioEl.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            return;
-          }).catch(() => {
-            startChiptuneBGM();
-          });
-          return;
+      try {
+        if (!bgmAudio) {
+          bgmAudio = new Audio('https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_loop.mp3');
+          bgmAudio.loop = true;
+          bgmAudio.volume = 0.35;
         }
+        bgmAudio.play().catch(() => {
+          startSynthBGM();
+        });
+      } catch (e) {
+        startSynthBGM();
       }
-      startChiptuneBGM();
     }
 
-    function startChiptuneBGM() {
-      if (bgmInterval) clearInterval(bgmInterval);
-      bgmStep = 0;
-
-      const melodyNotes = [
-        392, 0, 392, 0, 494, 0, 587, 0,
-        659, 0, 587, 0, 494, 0, 392, 0,
-        440, 0, 440, 0, 523, 0, 659, 0,
-        587, 0, 523, 0, 440, 0, 392, 0,
-        523, 587, 659, 698, 784, 0, 659, 0,
-        587, 0, 494, 0, 392, 0, 440, 0,
-        494, 0, 523, 0, 587, 0, 659, 0,
-        784, 0, 784, 880, 784, 0, 0, 0
-      ];
-
-      const bassNotes = [
-        196, 196, 294, 196, 262, 262, 196, 294,
-        220, 220, 330, 220, 294, 294, 220, 196,
-        262, 262, 330, 262, 392, 392, 262, 330,
-        294, 294, 370, 294, 392, 196, 294, 392
-      ];
-
-      const stepMs = 120;
-      bgmInterval = setInterval(() => {
+    function startSynthBGM() {
+      if (bgmSynthInterval) return;
+      const bassline = [130, 130, 164, 196, 130, 130, 220, 196];
+      let step = 0;
+      bgmSynthInterval = setInterval(() => {
         if (!soundEnabled) return;
-        const m = melodyNotes[bgmStep % melodyNotes.length];
-        const b = bassNotes[bgmStep % bassNotes.length];
-
-        if (m > 0) playTone(m, 'square', 0.08, 0.07);
-        if (b > 0 && bgmStep % 2 === 0) playTone(b, 'triangle', 0.13, 0.12);
-        if (bgmStep % 2 === 0) playTone(2400, 'sine', 0.02, 0.025);
-        bgmStep++;
-      }, stepMs);
+        playTone(bassline[step % bassline.length], 'triangle', 0.12, 0.08);
+        step++;
+      }, 240);
     }
 
     function stopRaceBGM() {
-      if (bgmInterval) {
-        clearInterval(bgmInterval);
-        bgmInterval = null;
+      if (bgmAudio) {
+        bgmAudio.pause();
+        bgmAudio.currentTime = 0;
       }
-      const audioEl = document.getElementById('mario-kart-bgm');
-      if (audioEl) {
-        try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) {}
-      }
-    }
-
-    // ==========================================
-    // QUESTIONS DATA MANAGEMENT
-    // ==========================================
-    let gameQuestions = null;
-
-    function loadActiveQuestions() {
-      const stored = localStorage.getItem('CIOS_GLOBETROTTER_QUESTIONS');
-      if (stored) {
-        try { gameQuestions = JSON.parse(stored); return; } catch (e) {}
-      }
-      if (typeof QUESTIONS !== 'undefined') {
-        gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
-      } else {
-        gameQuestions = {};
+      if (bgmSynthInterval) {
+        clearInterval(bgmSynthInterval);
+        bgmSynthInterval = null;
       }
     }
 
     // ==========================================
-    // GAME STATE
+    // GLOBAL STATE
     // ==========================================
     const State = {
-      role: 'host',
+      role: 'host', // 'host' or 'player'
       gamePin: 'CIOS-2627',
       circuit: 'world',
-      totalLaps: 10,
+      totalLaps: 15,
       currentLap: 1,
       players: [],
       myPlayerId: null,
       myPlayerInfo: null,
-      currentQuestion: null,
-      timerSec: 25,
-      timerInterval: null,
+      viewMode: '3d', // '3d' or '2d'
+      camMode: 'chase', // 'chase' or 'overhead'
       allowItems: true,
       allowBlueShell: true,
       allowJokers: true,
-      viewMode: '3d',
       raceFinished: false,
+      isSubscribed: false,
+      trackSpline: null,
       canvasAnimId: null,
-      trackSpline: [],
-      isSubscribed: false
+      botInterval: null
     };
 
+    let gameQuestions = {};
+    function loadActiveQuestions() {
+      try {
+        const saved = localStorage.getItem('CIOS_QUESTIONS_DATA');
+        if (saved) gameQuestions = JSON.parse(saved);
+        else if (typeof QUESTIONS !== 'undefined') gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
+      } catch (e) {
+        if (typeof QUESTIONS !== 'undefined') gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
+      }
+    }
+
     // ==========================================
-    // REALTIME NETWORKING (Resilient Handshake & Heartbeat)
+    // REALTIME ROOM & MESSAGING
     // ==========================================
     function initRealtimeRoom(onConnected) {
       if (!supabaseClient) return;
-
-      const roomName = `room-${State.gamePin.toLowerCase()}`;
-
-      // If already connected to this channel, run callback directly
-      if (realtimeChannel && State.isSubscribed) {
-        if (onConnected) onConnected();
-        return;
-      }
+      const roomName = `mario-kart-room-${State.gamePin}`;
 
       if (realtimeChannel) {
-        try { supabaseClient.removeChannel(realtimeChannel); } catch (e) {}
+        supabaseClient.removeChannel(realtimeChannel);
       }
 
       realtimeChannel = supabaseClient.channel(roomName, {
@@ -2237,21 +2111,23 @@ const QUESTIONS = {
         .on('broadcast', { event: 'game-start' }, ({ payload }) => {
           if (State.role === 'player') handleGameStartedByHost(payload);
         })
-        .on('broadcast', { event: 'question-sync' }, ({ payload }) => {
-          if (State.role === 'player') handleQuestionSync(payload);
+        .on('broadcast', { event: 'player-progress' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerProgressFromStudent(payload);
         })
-        .on('broadcast', { event: 'answer-submit' }, ({ payload }) => {
-          if (State.role === 'host') handlePlayerAnswer(payload);
+        .on('broadcast', { event: 'player-spin' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerSpinFromStudent(payload);
+        })
+        .on('broadcast', { event: 'player-win' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerWinFromStudent(payload);
         })
         .on('broadcast', { event: 'item-deploy' }, ({ payload }) => {
-          if (State.role === 'host') handlePlayerItem(payload);
+          if (State.role === 'host') handleItemDeployed(payload);
         })
         .on('broadcast', { event: 'state-broadcast' }, ({ payload }) => {
           if (State.role === 'player') handleStateSyncFromHost(payload);
         });
 
       realtimeChannel.subscribe((status) => {
-        console.log(`Realtime Channel Status: ${status}`);
         if (status === 'SUBSCRIBED') {
           State.isSubscribed = true;
           const statusTag = document.getElementById('host-sync-status');
@@ -2279,6 +2155,7 @@ const QUESTIONS = {
     // ==========================================
     let threeScene, threeCamera, threeRenderer;
     let threeTrackCurve, threeKartsMap = new Map();
+    let threeItemBoxes = [];
     let threeAnimId = null;
     let threeInitialized = false;
 
@@ -2295,17 +2172,16 @@ const QUESTIONS = {
       }
 
       const width = container.clientWidth || 1100;
-      const height = container.clientHeight || 400;
+      const height = container.clientHeight || 580;
 
-      // 1. Scene with Nintendo Sky Blue & Fog
+      // 1. Scene
       threeScene = new THREE.Scene();
-      threeScene.background = new THREE.Color(0x70c5ff);
-      threeScene.fog = new THREE.FogExp2(0x70c5ff, 0.0022);
+      threeScene.background = new THREE.Color(0x38bdf8); // Sky blue
+      threeScene.fog = new THREE.FogExp2(0x38bdf8, 0.0018);
 
       // 2. Camera
-      threeCamera = new THREE.PerspectiveCamera(45, width / height, 1, 3000);
-      threeCamera.position.set(0, 160, 240);
-      threeCamera.lookAt(0, 0, 0);
+      threeCamera = new THREE.PerspectiveCamera(50, width / height, 1, 3000);
+      threeCamera.position.set(0, 45, 120);
 
       // 3. Renderer
       threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -2316,73 +2192,76 @@ const QUESTIONS = {
       container.innerHTML = '';
       container.appendChild(threeRenderer.domElement);
 
-      // 4. Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      // 4. Lighting & Stadium Floodlights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
       threeScene.add(ambientLight);
 
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x44bb44, 0.4);
-      threeScene.add(hemiLight);
-
-      const sunLight = new THREE.DirectionalLight(0xfff8e7, 0.9);
-      sunLight.position.set(120, 250, 120);
+      const sunLight = new THREE.DirectionalLight(0xfff5e6, 0.95);
+      sunLight.position.set(150, 220, 100);
       sunLight.castShadow = true;
-      sunLight.shadow.mapSize.width = 1024;
-      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
       sunLight.shadow.camera.near = 10;
-      sunLight.shadow.camera.far = 600;
-      sunLight.shadow.camera.left = -250;
-      sunLight.shadow.camera.right = 250;
-      sunLight.shadow.camera.top = 250;
-      sunLight.shadow.camera.bottom = -250;
+      sunLight.shadow.camera.far = 700;
+      sunLight.shadow.camera.left = -280;
+      sunLight.shadow.camera.right = 280;
+      sunLight.shadow.camera.top = 280;
+      sunLight.shadow.camera.bottom = -280;
       threeScene.add(sunLight);
 
-      // 5. Green Terrain & Trees
-      const groundGeo = new THREE.PlaneGeometry(1400, 900, 32, 32);
-      const groundMat = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.8 });
+      // 5. Rolling Green Stadium Terrain
+      const groundGeo = new THREE.PlaneGeometry(1600, 1200, 32, 32);
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.85 });
       const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = -0.5;
       ground.receiveShadow = true;
       threeScene.add(ground);
 
-      for (let i = 0; i < 24; i++) {
-        const angle = (i / 24) * Math.PI * 2;
-        const dist = 230 + Math.random() * 70;
-        const tx = Math.cos(angle) * dist;
-        const tz = Math.sin(angle) * dist;
+      // Stadium Floodlight Towers
+      const towerPositions = [
+        [-190, -130], [190, -130], [190, 130], [-190, 130]
+      ];
+      towerPositions.forEach(([tx, tz]) => {
+        const poleGeo = new THREE.CylinderGeometry(1.8, 2.5, 70, 8);
+        const poleMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8 });
+        const pole = new THREE.Mesh(poleGeo, poleMat);
+        pole.position.set(tx, 35, tz);
+        pole.castShadow = true;
+        threeScene.add(pole);
 
-        const trunkGeo = new THREE.CylinderGeometry(2, 3, 12, 6);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x795548 });
-        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.set(tx, 6, tz);
-        trunk.castShadow = true;
-        threeScene.add(trunk);
+        const headGeo = new THREE.BoxGeometry(10, 6, 4);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.set(tx, 70, tz);
+        head.lookAt(0, 0, 0);
+        threeScene.add(head);
 
-        const foliageGeo = new THREE.ConeGeometry(9, 20, 7);
-        const foliageMat = new THREE.MeshStandardMaterial({ color: (i % 2 === 0 ? 0x2ecc71 : 0x1abc9c) });
-        const foliage = new THREE.Mesh(foliageGeo, foliageMat);
-        foliage.position.set(tx, 18, tz);
-        foliage.castShadow = true;
-        threeScene.add(foliage);
-      }
+        const spot = new THREE.SpotLight(0xffffff, 0.4);
+        spot.position.set(tx, 70, tz);
+        spot.target.position.set(tx * 0.3, 0, tz * 0.3);
+        threeScene.add(spot);
+        threeScene.add(spot.target);
+      });
 
-      // 6. 3D Mario Kart Spline Track
+      // 6. Mario Kart Circuit Spline (Hairpin, chicanes, high-speed straights)
       const curvePoints = [
-        new THREE.Vector3(-180, 0, -80),
-        new THREE.Vector3(-90, 6, -110),
-        new THREE.Vector3(60, 2, -100),
-        new THREE.Vector3(160, 0, -50),
-        new THREE.Vector3(190, 4, 30),
-        new THREE.Vector3(130, 8, 95),
-        new THREE.Vector3(30, 10, 65),
-        new THREE.Vector3(-50, 4, 85),
-        new THREE.Vector3(-140, 0, 70),
-        new THREE.Vector3(-200, 2, 0)
+        new THREE.Vector3(-190, 0, -70),
+        new THREE.Vector3(-100, 4, -115),
+        new THREE.Vector3(70, 2, -105),
+        new THREE.Vector3(180, 0, -45),
+        new THREE.Vector3(200, 5, 40),
+        new THREE.Vector3(140, 7, 105),
+        new THREE.Vector3(40, 8, 70),
+        new THREE.Vector3(-40, 4, 95),
+        new THREE.Vector3(-150, 0, 75),
+        new THREE.Vector3(-210, 2, 0)
       ];
       threeTrackCurve = new THREE.CatmullRomCurve3(curvePoints, true, 'centripetal');
 
       build3DTrackMesh(threeTrackCurve);
       build3DFinishBanner(threeTrackCurve);
+      build3DProps(threeTrackCurve);
 
       threeInitialized = true;
       animate3D();
@@ -2400,9 +2279,9 @@ const QUESTIONS = {
     }
 
     function build3DTrackMesh(curve) {
-      const segments = 220;
-      const trackWidth = 32;
-      const curbWidth = 3.5;
+      const segments = 240;
+      const trackWidth = 36;
+      const curbWidth = 4;
 
       const trackGeo = new THREE.BufferGeometry();
       const pos = [];
@@ -2426,16 +2305,16 @@ const QUESTIONS = {
 
         pos.push(left.x, left.y + 0.15, left.z);
         pos.push(right.x, right.y + 0.15, right.z);
-        uvs.push(0, t * 12);
-        uvs.push(1, t * 12);
+        uvs.push(0, t * 16);
+        uvs.push(1, t * 16);
 
         const curbLeftOuter = new THREE.Vector3().copy(left).addScaledVector(normal, -curbWidth);
-        posCL.push(curbLeftOuter.x, curbLeftOuter.y + 0.25, curbLeftOuter.z);
-        posCL.push(left.x, left.y + 0.25, left.z);
+        posCL.push(curbLeftOuter.x, curbLeftOuter.y + 0.28, curbLeftOuter.z);
+        posCL.push(left.x, left.y + 0.28, left.z);
 
         const curbRightOuter = new THREE.Vector3().copy(right).addScaledVector(normal, curbWidth);
-        posCR.push(right.x, right.y + 0.25, right.z);
-        posCR.push(curbRightOuter.x, curbRightOuter.y + 0.25, curbRightOuter.z);
+        posCR.push(right.x, right.y + 0.28, right.z);
+        posCR.push(curbRightOuter.x, curbRightOuter.y + 0.28, curbRightOuter.z);
 
         if (i < segments) {
           const a = i * 2;
@@ -2447,20 +2326,26 @@ const QUESTIONS = {
         }
       }
 
+      // Asphalt Track
       trackGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
       trackGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
       trackGeo.setIndex(indices);
       trackGeo.computeVertexNormals();
 
-      const trackMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.6, metalness: 0.1 });
+      const trackMat = new THREE.MeshStandardMaterial({
+        color: 0x1e242d, // Dark racing asphalt
+        roughness: 0.75,
+        metalness: 0.1
+      });
       const trackMesh = new THREE.Mesh(trackGeo, trackMat);
       trackMesh.receiveShadow = true;
       threeScene.add(trackMesh);
 
+      // Checkered Red & White Curbs
       curbGeoL.setAttribute('position', new THREE.Float32BufferAttribute(posCL, 3));
       curbGeoL.setIndex(indices);
       curbGeoL.computeVertexNormals();
-      const curbMeshL = new THREE.Mesh(curbGeoL, new THREE.MeshStandardMaterial({ color: 0xe74c3c, roughness: 0.5 }));
+      const curbMeshL = new THREE.Mesh(curbGeoL, new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 }));
       threeScene.add(curbMeshL);
 
       curbGeoR.setAttribute('position', new THREE.Float32BufferAttribute(posCR, 3));
@@ -2479,137 +2364,264 @@ const QUESTIONS = {
       const archGroup = new THREE.Group();
       archGroup.position.copy(pt);
 
-      const pillarGeo = new THREE.CylinderGeometry(1.4, 1.6, 26, 12);
-      const pillarMat = new THREE.MeshStandardMaterial({ color: 0xff4757, metalness: 0.4 });
+      const pillarGeo = new THREE.CylinderGeometry(2, 2.2, 32, 12);
+      const pillarMat = new THREE.MeshStandardMaterial({ color: 0xff4757, metalness: 0.6 });
 
       const pLeft = new THREE.Mesh(pillarGeo, pillarMat);
-      pLeft.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(-18));
-      pLeft.position.y = 13;
+      pLeft.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(-21));
+      pLeft.position.y = 16;
       pLeft.castShadow = true;
       archGroup.add(pLeft);
 
       const pRight = new THREE.Mesh(pillarGeo, pillarMat);
-      pRight.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(18));
-      pRight.position.y = 13;
+      pRight.position.copy(new THREE.Vector3().copy(normal).multiplyScalar(21));
+      pRight.position.y = 16;
       pRight.castShadow = true;
       archGroup.add(pRight);
 
-      const barGeo = new THREE.BoxGeometry(38, 6, 2.5);
-      const barMat = new THREE.MeshStandardMaterial({ color: 0xffa502, metalness: 0.2 });
+      const barGeo = new THREE.BoxGeometry(44, 8, 3.5);
+      const barMat = new THREE.MeshStandardMaterial({ color: 0xffa502, metalness: 0.3 });
       const bar = new THREE.Mesh(barGeo, barMat);
-      bar.position.y = 25;
+      bar.position.y = 30;
       bar.lookAt(new THREE.Vector3().copy(pt).add(tangent));
       bar.castShadow = true;
       archGroup.add(bar);
 
-      const stripGeo = new THREE.PlaneGeometry(32, 5);
+      // Checkered start/finish ground strip
+      const stripGeo = new THREE.PlaneGeometry(36, 6);
       const stripMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const strip = new THREE.Mesh(stripGeo, stripMat);
       strip.rotation.x = -Math.PI / 2;
-      strip.position.y = 0.25;
+      strip.position.y = 0.3;
       archGroup.add(strip);
 
       threeScene.add(archGroup);
     }
 
+    function build3DProps(curve) {
+      // 1. Glowing Neon Boost Pads (>>>)
+      const boostT = [0.22, 0.52, 0.78];
+      boostT.forEach(t => {
+        const pt = curve.getPointAt(t);
+        const tangent = curve.getTangentAt(t).normalize();
+        const boostGeo = new THREE.PlaneGeometry(24, 9);
+        const boostMat = new THREE.MeshStandardMaterial({
+          color: 0x00f2fe,
+          emissive: 0x00f2fe,
+          emissiveIntensity: 0.75
+        });
+        const pad = new THREE.Mesh(boostGeo, boostMat);
+        pad.rotation.x = -Math.PI / 2;
+        pad.position.copy(pt);
+        pad.position.y += 0.25;
+        pad.lookAt(new THREE.Vector3().copy(pt).add(tangent));
+        threeScene.add(pad);
+      });
+
+      // 2. Floating Golden [ ? ] Item Boxes
+      const boxT = [0.15, 0.35, 0.45, 0.65, 0.85, 0.95];
+      boxT.forEach(t => {
+        const pt = curve.getPointAt(t);
+        const boxGeo = new THREE.BoxGeometry(6, 6, 6);
+        const boxMat = new THREE.MeshStandardMaterial({
+          color: 0xffd700,
+          emissive: 0xffa502,
+          emissiveIntensity: 0.5,
+          transparent: true,
+          opacity: 0.88,
+          roughness: 0.3
+        });
+        const box = new THREE.Mesh(boxGeo, boxMat);
+        box.position.set(pt.x, pt.y + 6, pt.z);
+        box.baseY = pt.y + 6;
+        threeScene.add(box);
+        threeItemBoxes.push(box);
+      });
+    }
+
+    // ==========================================
+    // CHUNKY 3D KART WITH HIGH-DPI BILLBOARD
+    // ==========================================
     function create3DKart(player) {
       const kart = new THREE.Group();
 
-      const bodyGeo = new THREE.BoxGeometry(7, 3, 11);
+      // Main Chassis (Chunky 3x scale)
+      const bodyGeo = new THREE.BoxGeometry(13, 4.5, 20);
       const bodyMat = new THREE.MeshStandardMaterial({
-        color: player.color || 0xff4757,
-        roughness: 0.25,
-        metalness: 0.35
+        color: player.color || 0xef4444,
+        roughness: 0.2,
+        metalness: 0.5
       });
       const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.position.y = 2.4;
+      body.position.y = 3.6;
       body.castShadow = true;
       kart.add(body);
 
-      const noseGeo = new THREE.BoxGeometry(5.5, 1.8, 4);
+      // Nose / Hood
+      const noseGeo = new THREE.BoxGeometry(9, 2.8, 8);
       const nose = new THREE.Mesh(noseGeo, bodyMat);
-      nose.position.set(0, 2, 6);
+      nose.position.set(0, 3, 11);
       nose.castShadow = true;
       kart.add(nose);
 
-      const wheelGeo = new THREE.CylinderGeometry(1.8, 1.8, 1.4, 14);
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
-      const rimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.7 });
+      // Cockpit in metallic charcoal
+      const cockpitGeo = new THREE.BoxGeometry(8, 3.5, 8);
+      const cockpitMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+      const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
+      cockpit.position.set(0, 5.2, 0);
+      cockpit.castShadow = true;
+      kart.add(cockpit);
+
+      // Rear Spoiler / Wing on 2 struts
+      const wingGeo = new THREE.BoxGeometry(13, 1.2, 4);
+      const wingMat = new THREE.MeshStandardMaterial({ color: player.color || 0xef4444, metalness: 0.4 });
+      const wing = new THREE.Mesh(wingGeo, wingMat);
+      wing.position.set(0, 7.8, -9);
+      wing.castShadow = true;
+      kart.add(wing);
+
+      const strutGeo = new THREE.CylinderGeometry(0.5, 0.5, 3.5, 6);
+      const strutMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+      const sLeft = new THREE.Mesh(strutGeo, strutMat);
+      sLeft.position.set(-4, 6, -9);
+      kart.add(sLeft);
+      const sRight = new THREE.Mesh(strutGeo, strutMat);
+      sRight.position.set(4, 6, -9);
+      kart.add(sRight);
+
+      // 4 Large Rubber Racing Tires with Chrome Rims
+      const tireGeo = new THREE.CylinderGeometry(3.4, 3.4, 2.5, 16);
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.85 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.85, roughness: 0.2 });
 
       const wheelPositions = [
-        [-4, 1.8, 4],
-        [4, 1.8, 4],
-        [-4, 1.8, -4],
-        [4, 1.8, -4]
+        [-7.5, 3.4, 7],
+        [7.5, 3.4, 7],
+        [-7.5, 3.4, -7],
+        [7.5, 3.4, -7]
       ];
       wheelPositions.forEach(([wx, wy, wz]) => {
-        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        const wheel = new THREE.Mesh(tireGeo, tireMat);
         wheel.rotation.z = Math.PI / 2;
         wheel.position.set(wx, wy, wz);
         wheel.castShadow = true;
         kart.add(wheel);
 
-        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1.45, 10), rimMat);
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.6, 10), rimMat);
         hub.rotation.z = Math.PI / 2;
         hub.position.set(wx, wy, wz);
         kart.add(hub);
       });
 
-      // Character Billboard Sprite
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-      ctx.beginPath();
-      ctx.roundRect(10, 48, 236, 68, 16);
-      ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = player.color || '#fff';
-      ctx.stroke();
-
-      ctx.font = '50px Outfit, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(player.emoji || 'ðŸŽï¸', 128, 48);
-
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 22px Plus Jakarta Sans, sans-serif';
-      ctx.fillText(player.name.substring(0, 14), 128, 92);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.position.set(0, 11, 0);
-      sprite.scale.set(16, 8, 1);
-      kart.add(sprite);
-
-      // Turbo boost flame
-      const flameGeo = new THREE.ConeGeometry(2, 6, 8);
+      // Turbo Exhaust Flame
+      const flameGeo = new THREE.ConeGeometry(3.5, 10, 10);
       const flameMat = new THREE.MeshBasicMaterial({ color: 0xff4757, transparent: true, opacity: 0 });
       const flame = new THREE.Mesh(flameGeo, flameMat);
       flame.rotation.x = -Math.PI / 2;
-      flame.position.set(0, 2.5, -7);
+      flame.position.set(0, 3.5, -12);
       kart.add(flame);
       kart.flameMesh = flame;
+
+      // High-DPI Billboard Canvas (512x256) - Readable from 5+ meters!
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 256;
+      kart.billboardCanvas = canvas;
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      kart.billboardTexture = texture;
+
+      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.position.set(0, 18, 0);
+      sprite.scale.set(30, 15, 1);
+      kart.add(sprite);
+
+      updateKartBillboard(kart, player, 1);
 
       threeScene.add(kart);
       threeKartsMap.set(player.id, kart);
       return kart;
     }
 
+    function updateKartBillboard(kart, player, rank) {
+      if (!kart.billboardCanvas) return;
+      const ctx = kart.billboardCanvas.getContext('2d');
+      const w = 512;
+      const h = 256;
+      ctx.clearRect(0, 0, w, h);
+
+      // Dark glass container with colored border
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+      ctx.beginPath();
+      ctx.roundRect(14, 20, w - 28, h - 40, 24);
+      ctx.fill();
+
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = (rank === 1 ? '#ffa502' : (player.color || '#2ed573'));
+      ctx.stroke();
+
+      // Large Avatar Emoji
+      ctx.font = '76px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(player.emoji || 'ðŸŽï¸', w / 2, 95);
+
+      // Rank Pill
+      ctx.fillStyle = (rank === 1 ? '#ffa502' : 'rgba(255,255,255,0.18)');
+      ctx.beginPath();
+      ctx.roundRect((w / 2) - 80, 110, 160, 32, 12);
+      ctx.fill();
+
+      ctx.font = 'bold 20px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = (rank === 1 ? '#000000' : '#ffffff');
+      ctx.fillText(`P${rank} â€¢ ${(player.charId || 'RACER').toUpperCase()}`, w / 2, 133);
+
+      // Team / Student Name (Bold & Crisp)
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 34px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText((player.name || 'Team').substring(0, 14), w / 2, 180);
+
+      // Laps Completed Tag
+      ctx.fillStyle = '#2ed573';
+      ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
+      const lapsCount = player.correctCount || Math.round((player.progress / 100) * State.totalLaps);
+      ctx.fillText(`ðŸ ${lapsCount} / ${State.totalLaps} Goed`, w / 2, 214);
+
+      kart.billboardTexture.needsUpdate = true;
+    }
+
+    // ==========================================
+    // 3D ANIMATION LOOP & ACTION CAMERA
+    // ==========================================
     function animate3D() {
       if (!threeScene || !threeCamera || !threeRenderer) return;
       if (State.viewMode !== '3d') return;
 
       threeAnimId = requestAnimationFrame(animate3D);
 
+      const time = Date.now() * 0.002;
+
+      // Animate floating item boxes
+      threeItemBoxes.forEach((box, idx) => {
+        box.rotation.y += 0.03;
+        box.rotation.x += 0.015;
+        box.position.y = box.baseY + Math.sin(time + idx) * 1.5;
+      });
+
       if (threeTrackCurve && State.players) {
         let leadKartPos = null;
+        let leadTangent = null;
         let maxProg = -1;
+
+        const sortedPlayers = [...State.players].sort((a,b) => b.progress - a.progress);
 
         State.players.forEach(player => {
           let kart = threeKartsMap.get(player.id);
           if (!kart) kart = create3DKart(player);
+
+          const rank = sortedPlayers.findIndex(p => p.id === player.id) + 1;
+          updateKartBillboard(kart, player, rank);
 
           const t = Math.max(0, Math.min(99.9, player.progress)) / 100;
           const pos = threeTrackCurve.getPointAt(t);
@@ -2617,36 +2629,46 @@ const QUESTIONS = {
           const up = new THREE.Vector3(0, 1, 0);
           const normal = new THREE.Vector3().crossVectors(tangent, up).normalize();
 
-          const laneOffset = ((String(player.id).charCodeAt(String(player.id).length - 1) % 5) - 2) * 4;
+          const laneOffset = ((String(player.id).charCodeAt(String(player.id).length - 1) % 5) - 2) * 4.5;
           kart.position.copy(pos).addScaledVector(normal, laneOffset);
 
           if (player.spinning) {
-            kart.rotation.y += 0.35;
+            kart.rotation.y += 0.45;
           } else {
             kart.lookAt(new THREE.Vector3().copy(pos).add(tangent).addScaledVector(normal, laneOffset));
           }
 
           if (kart.flameMesh) {
-            kart.flameMesh.material.opacity = player.boosted ? 0.9 : 0;
-            if (player.boosted) kart.flameMesh.scale.set(1 + Math.random()*0.5, 1 + Math.random()*0.8, 1);
+            kart.flameMesh.material.opacity = player.boosted ? 0.95 : 0;
+            if (player.boosted) kart.flameMesh.scale.set(1 + Math.random()*0.6, 1 + Math.random()*0.8, 1);
           }
 
           if (player.progress > maxProg) {
             maxProg = player.progress;
             leadKartPos = kart.position;
+            leadTangent = tangent;
           }
         });
 
-        // Dynamic 3D Camera tracking the leader smoothly
-        if (leadKartPos) {
-          const targetCamX = leadKartPos.x * 0.45;
-          const targetCamZ = leadKartPos.z * 0.45 + 190;
-          const targetCamY = 140;
+        // Dynamic Camera Angle
+        if (leadKartPos && leadTangent) {
+          if (State.camMode === 'chase') {
+            // Action Chase Cam: Close behind leading pack
+            const targetCamX = leadKartPos.x - leadTangent.x * 65;
+            const targetCamZ = leadKartPos.z - leadTangent.z * 65;
+            const targetCamY = leadKartPos.y + 36;
 
-          threeCamera.position.x += (targetCamX - threeCamera.position.x) * 0.04;
-          threeCamera.position.y += (targetCamY - threeCamera.position.y) * 0.04;
-          threeCamera.position.z += (targetCamZ - threeCamera.position.z) * 0.04;
-          threeCamera.lookAt(leadKartPos.x * 0.6, 8, leadKartPos.z * 0.6);
+            threeCamera.position.x += (targetCamX - threeCamera.position.x) * 0.05;
+            threeCamera.position.y += (targetCamY - threeCamera.position.y) * 0.05;
+            threeCamera.position.z += (targetCamZ - threeCamera.position.z) * 0.05;
+            threeCamera.lookAt(leadKartPos.x + leadTangent.x * 20, leadKartPos.y + 6, leadKartPos.z + leadTangent.z * 20);
+          } else {
+            // Overhead Bird's Eye Cam
+            threeCamera.position.x += (0 - threeCamera.position.x) * 0.04;
+            threeCamera.position.y += (220 - threeCamera.position.y) * 0.04;
+            threeCamera.position.z += (20 - threeCamera.position.z) * 0.04;
+            threeCamera.lookAt(0, 0, 0);
+          }
         }
       }
 
@@ -2662,26 +2684,33 @@ const QUESTIONS = {
       if (State.viewMode === '3d') {
         if (threeCont) threeCont.style.display = 'block';
         if (canvas2D) canvas2D.style.display = 'none';
-        if (label) label.innerHTML = 'Weergave: <strong>3D Arena</strong>';
+        if (label) label.innerText = '3D Arena';
         if (State.canvasAnimId) cancelAnimationFrame(State.canvasAnimId);
         if (!threeInitialized) init3DTrackEngine();
         else animate3D();
       } else {
         if (threeCont) threeCont.style.display = 'none';
         if (canvas2D) canvas2D.style.display = 'block';
-        if (label) label.innerHTML = 'Weergave: <strong>2D Kaart</strong>';
+        if (label) label.innerText = '2D Kaart';
         if (threeAnimId) cancelAnimationFrame(threeAnimId);
         initTrackCanvas();
       }
     }
 
+    function toggleCameraMode() {
+      State.camMode = State.camMode === 'chase' ? 'overhead' : 'chase';
+      const label = document.getElementById('cam-mode-label');
+      if (label) {
+        label.innerText = State.camMode === 'chase' ? 'Cam: Actie Chase' : 'Cam: Overzicht';
+      }
+    }
+
     // ==========================================
-    // 2D CANVAS MARIO KART CIRCUIT ENGINE
+    // 2D CANVAS MARIO KART FALLBACK ENGINE
     // ==========================================
     function initTrackCanvas() {
       const canvas = document.getElementById('race-canvas');
       const ctx = canvas.getContext('2d');
-
       const w = canvas.width;
       const h = canvas.height;
       const points = [];
@@ -2690,158 +2719,53 @@ const QUESTIONS = {
       for (let i = 0; i < steps; i++) {
         const t = (i / steps) * Math.PI * 2;
         const rx = (w / 2) - 100;
-        const ry = (h / 2) - 65;
+        const ry = (h / 2) - 80;
         const cx = w / 2;
         const cy = h / 2;
-
         let x = cx + rx * Math.cos(t);
         let y = cy + ry * Math.sin(t);
-
-        if (t > Math.PI * 0.2 && t < Math.PI * 0.8) {
-          y += Math.sin(t * 3) * 20;
-        }
-
+        if (t > Math.PI * 0.2 && t < Math.PI * 0.8) y += Math.sin(t * 3) * 25;
         points.push({ x, y });
       }
       State.trackSpline = points;
 
       if (State.canvasAnimId) cancelAnimationFrame(State.canvasAnimId);
       function render() {
-        drawTrack(ctx, canvas.width, canvas.height);
-        drawKarts(ctx);
+        ctx.clearRect(0, 0, w, h);
+        // Draw Grass
+        ctx.fillStyle = '#22c55e';
+        ctx.fillRect(0, 0, w, h);
+        // Draw 2D Asphalt
+        ctx.strokeStyle = '#1e242d';
+        ctx.lineWidth = 60;
+        ctx.beginPath();
+        points.forEach((p, idx) => { if (idx === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+        ctx.closePath();
+        ctx.stroke();
+        // Draw Dashed Line
+        ctx.strokeStyle = '#f1c40f';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([12, 12]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // Draw 2D Karts
+        State.players.forEach(p => {
+          const idx = Math.floor((p.progress / 100) * points.length) % points.length;
+          const pos = points[idx];
+          ctx.font = '24px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(p.emoji || 'ðŸŽï¸', pos.x, pos.y + 8);
+          ctx.font = 'bold 11px "Plus Jakarta Sans"';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(p.name.substring(0, 10), pos.x, pos.y - 14);
+        });
         State.canvasAnimId = requestAnimationFrame(render);
       }
       render();
     }
 
-    function drawTrack(ctx, w, h) {
-      // Grass
-      ctx.fillStyle = '#1b7a42';
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = '#166536';
-      ctx.beginPath();
-      ctx.arc(w / 2, h / 2, 70, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Red & white curbstones
-      ctx.lineWidth = 76;
-      ctx.strokeStyle = '#e74c3c';
-      ctx.setLineDash([18, 18]);
-      ctx.beginPath();
-      State.trackSpline.forEach((p, idx) => {
-        if (idx === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      });
-      ctx.closePath();
-      ctx.stroke();
-
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineDashOffset = 18;
-      ctx.stroke();
-
-      // Asphalt
-      ctx.setLineDash([]);
-      ctx.lineWidth = 62;
-      ctx.strokeStyle = '#2d3436';
-      ctx.stroke();
-
-      // Dashed line
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-      ctx.setLineDash([10, 10]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Finish line
-      const startP = State.trackSpline[0];
-      const nextP = State.trackSpline[1];
-      const angle = Math.atan2(nextP.y - startP.y, nextP.x - startP.x) + Math.PI / 2;
-
-      ctx.save();
-      ctx.translate(startP.x, startP.y);
-      ctx.rotate(angle);
-      for (let r = -30; r < 30; r += 10) {
-        ctx.fillStyle = (Math.floor(r / 10) % 2 === 0) ? '#ffffff' : '#000000';
-        ctx.fillRect(r, -4, 10, 8);
-      }
-      ctx.restore();
-    }
-
-    function getTrackCoordinates(pct) {
-      if (!State.trackSpline || State.trackSpline.length === 0) return { x: 100, y: 100, angle: 0 };
-      const normalized = Math.max(0, Math.min(100, pct)) / 100;
-      const idx = Math.floor(normalized * (State.trackSpline.length - 1));
-      const nextIdx = (idx + 1) % State.trackSpline.length;
-
-      const p1 = State.trackSpline[idx];
-      const p2 = State.trackSpline[nextIdx];
-      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-
-      return { x: p1.x, y: p1.y, angle };
-    }
-
-    function drawKarts(ctx) {
-      if (!State.players) return;
-
-      State.players.forEach((player) => {
-        const { x, y, angle } = getTrackCoordinates(player.progress);
-
-        const laneOffset = ((String(player.id).charCodeAt(String(player.id).length - 1) % 5) - 2) * 8;
-        const finalX = x + Math.cos(angle + Math.PI/2) * laneOffset;
-        const finalY = y + Math.sin(angle + Math.PI/2) * laneOffset;
-
-        ctx.save();
-        ctx.translate(finalX, finalY);
-
-        if (player.spinning) {
-          ctx.rotate(player.spinAngle || 0);
-          player.spinAngle = (player.spinAngle || 0) + 0.4;
-        } else {
-          ctx.rotate(angle);
-        }
-
-        // Body
-        ctx.fillStyle = player.color || '#ff4757';
-        ctx.beginPath();
-        ctx.roundRect(-12, -7, 24, 14, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Wheels
-        ctx.fillStyle = '#111';
-        ctx.fillRect(-10, -9, 6, 2);
-        ctx.fillRect(4, -9, 6, 2);
-        ctx.fillRect(-10, 7, 6, 2);
-        ctx.fillRect(4, 7, 6, 2);
-
-        // Character Emoji
-        ctx.font = '14px Outfit, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(player.emoji || '\u{1F344}', 0, 0);
-
-        if (player.boosted) {
-          ctx.font = '12px Outfit';
-          ctx.fillText('\u{1F525}', -18, 0);
-        }
-
-        // Name tag
-        ctx.rotate(-angle);
-        ctx.font = 'bold 9px Plus Jakarta Sans, sans-serif';
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(-24, -20, 48, 12);
-        ctx.fillStyle = '#fff';
-        ctx.fillText(player.name.substring(0, 8), 0, -14);
-
-        ctx.restore();
-      });
-    }
-
     // ==========================================
-    // SETUP & AVATAR PICKER
+    // ROLE SWITCHING & AVATAR PICKER
     // ==========================================
     let selectedCharId = 'mario';
 
@@ -2864,9 +2788,6 @@ const QUESTIONS = {
       });
     }
 
-    // ==========================================
-    // ROLE SWITCHING
-    // ==========================================
     function switchRole(role) {
       State.role = role;
       const roleBar = document.getElementById('role-selector-bar');
@@ -2890,7 +2811,7 @@ const QUESTIONS = {
         document.getElementById('role-player-btn').classList.remove('active');
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-        if (State.currentQuestion) {
+        if (document.getElementById('host-race-screen').classList.contains('active')) {
           document.getElementById('host-race-screen').classList.add('active');
         } else {
           document.getElementById('host-lobby-screen').classList.add('active');
@@ -2908,7 +2829,7 @@ const QUESTIONS = {
     }
 
     // ==========================================
-    // HOST DIGIBORD LOBBY
+    // HOST DIGIBORD LOBBY & ROSTER
     // ==========================================
     function handlePlayerJoined(payload) {
       if (State.players.some(p => p.id === payload.id)) return;
@@ -2918,13 +2839,13 @@ const QUESTIONS = {
         charId: payload.charId,
         emoji: payload.emoji,
         color: payload.color,
-        progress: 5,
+        progress: 2,
+        correctCount: 0,
         score: 0,
         item: null,
         starRounds: 0,
         boosted: false,
-        spinning: false,
-        streak: 0
+        spinning: false
       });
 
       updateRosterDisplay();
@@ -2964,7 +2885,7 @@ const QUESTIONS = {
     }
 
     // ==========================================
-    // STARTING THE GRAND PRIX
+    // STARTING THE GRAND PRIX (HOST)
     // ==========================================
     function startHostGrandPrix() {
       if (State.players.length === 0) {
@@ -2972,14 +2893,21 @@ const QUESTIONS = {
       }
 
       State.circuit = document.getElementById('circuit-select').value;
-      State.totalLaps = parseInt(document.getElementById('race-rounds').value);
-      State.currentLap = 1;
+      State.totalLaps = parseInt(document.getElementById('race-rounds').value) || 15;
       State.raceFinished = false;
 
       document.getElementById('host-lobby-screen').classList.remove('active');
       document.getElementById('host-race-screen').classList.add('active');
 
-      document.getElementById('arena-total-laps').innerText = State.totalLaps;
+      const circuitNames = {
+        europa: 'ðŸ‡ªðŸ‡º Europa Grand Prix',
+        cariben: 'ðŸŒ´ Cariben & Latijns-Amerika GP',
+        safari: 'ðŸ¦ Safari & OceaniÃ« GP',
+        world: 'ðŸŒ Wereldkampioenschap All-Stars'
+      };
+      document.getElementById('arena-circuit-tag').innerText = circuitNames[State.circuit] || 'ðŸŒ Mario Kart Grand Prix';
+      document.getElementById('arena-race-goal-tag').innerText = `EERSTE MET ${State.totalLaps} GOED WINT!`;
+      document.getElementById('arena-total-laps-tag').innerText = `Doel: ${State.totalLaps} Goed`;
       document.getElementById('arena-player-count-tag').innerText = `${State.players.length} Racers op de baan`;
 
       if (State.viewMode === '3d') {
@@ -2990,116 +2918,133 @@ const QUESTIONS = {
       playSound('go');
       startRaceBGM();
 
+      // Broadcast game start to all student phones
       broadcastEvent('game-start', {
         circuit: State.circuit,
         totalLaps: State.totalLaps
       });
 
-      nextHostTurn();
-    }
-
-    function getCountriesForCircuit(circuitKey) {
-      const pools = {
-        europa: ['nederland', 'spanje', 'duitsland', 'frankrijk', 'italie', 'verenigd_koninkrijk'],
-        cariben: ['aruba', 'bonaire', 'curacao', 'suriname', 'brazilie', 'colombia'],
-        safari: ['kenia', 'zuid_afrika', 'oeganda', 'indonesie', 'australie'],
-        world: Object.keys(gameQuestions)
-      };
-      return pools[circuitKey] || pools.world;
-    }
-
-    function nextHostTurn() {
-      if (State.raceFinished) return;
-      clearInterval(State.timerInterval);
-
-      const maxProgress = Math.max(...State.players.map(p => p.progress));
-      if (maxProgress >= 95 || State.currentLap > State.totalLaps) {
-        finishGrandPrixHost();
-        return;
-      }
-
-      document.getElementById('arena-current-lap').innerText = State.currentLap;
-
-      State.answersThisRound = new Set();
-      const humanRacers = State.players.filter(p => !p.id.startsWith('bot-'));
-      const ansCounter = document.getElementById('arena-answers-count');
-      if (ansCounter) {
-        ansCounter.innerHTML = `<i class="fa-solid fa-users"></i> 0 / ${humanRacers.length} binnen`;
-      }
-
-      const countries = getCountriesForCircuit(State.circuit);
-      const randomCountryKey = countries[Math.floor(Math.random() * countries.length)];
-      const cData = gameQuestions[randomCountryKey];
-
-      if (!cData || !cData.questions || cData.questions.length === 0) return;
-      const q = cData.questions[Math.floor(Math.random() * cData.questions.length)];
-      State.currentQuestion = { ...q, country: cData.title || randomCountryKey };
-
-      document.getElementById('arena-q-topic').innerHTML = `&#x1F30D; ${State.currentQuestion.country} | Sportcultuur`;
-      document.getElementById('arena-checkpoint-tag').innerHTML = `&#x1F30D; Checkpoint ${State.currentLap}: ${State.currentQuestion.country}`;
-      document.getElementById('arena-question-text').innerText = q.question;
-
-      const optContainer = document.getElementById('arena-options-container');
-      optContainer.innerHTML = '';
-      ['A', 'B', 'C'].forEach(l => {
-        if (q.options && q.options[l]) {
-          const btn = document.createElement('div');
-          btn.className = 'opt-live-btn';
-          btn.id = `arena-opt-${l}`;
-          btn.innerHTML = `<strong>${l}:</strong> <span>${q.options[l]}</span>`;
-          optContainer.appendChild(btn);
-        }
-      });
-
-      broadcastEvent('question-sync', {
-        question: q.question,
-        options: q.options,
-        country: State.currentQuestion.country,
-        lap: State.currentLap
-      });
-
-      startHostTimer();
-    }
-
-    function startHostTimer() {
-      State.timerSec = 25;
-      document.getElementById('arena-timer-num').innerText = State.timerSec;
-
-      State.timerInterval = setInterval(() => {
-        State.timerSec--;
-        document.getElementById('arena-timer-num').innerText = State.timerSec;
-
-        if (State.timerSec <= 5 && State.timerSec > 0) playSound('countdown');
-
-        if (State.timerSec <= 0) {
-          clearInterval(State.timerInterval);
-          handleRoundTimeout();
-        }
-      }, 1000);
-    }
-
-    function handleRoundTimeout() {
-      State.players.filter(p => p.id.startsWith('bot-')).forEach(b => {
-        if (Math.random() < 0.65) {
-          b.progress = Math.min(95, b.progress + (100 / State.totalLaps));
-        }
-      });
-
       updateArenaLeaderboard();
-      showFeedbackModal(false, State.currentQuestion.explanation);
+      logArenaEvent(`ðŸ De Grand Prix is gestart! Eerste team met ${State.totalLaps} goede antwoorden wint de beker!`);
+
+      // Start Bot progression loop (autonomous competition)
+      startBotLoop();
+    }
+
+    function startBotLoop() {
+      if (State.botInterval) clearInterval(State.botInterval);
+      State.botInterval = setInterval(() => {
+        if (State.raceFinished) {
+          clearInterval(State.botInterval);
+          return;
+        }
+
+        const bots = State.players.filter(p => p.id.startsWith('bot-'));
+        if (bots.length === 0) return;
+
+        const randomBot = bots[Math.floor(Math.random() * bots.length)];
+        if (!randomBot) return;
+
+        // 65% chance to answer correctly
+        if (Math.random() < 0.65) {
+          randomBot.correctCount = (randomBot.correctCount || 0) + 1;
+          randomBot.progress = Math.min(100, (randomBot.correctCount / State.totalLaps) * 100);
+          randomBot.boosted = true;
+          setTimeout(() => randomBot.boosted = false, 1400);
+
+          logArenaEvent(`âš¡ ${randomBot.name} (${randomBot.charId.toUpperCase()}) antwoordt goed! (${randomBot.correctCount}/${State.totalLaps})`);
+
+          if (randomBot.correctCount >= State.totalLaps) {
+            finishGrandPrixHost(randomBot);
+            return;
+          }
+        } else {
+          randomBot.spinning = true;
+          setTimeout(() => randomBot.spinning = false, 2000);
+          logArenaEvent(`ðŸŒ ${randomBot.name} slipt op een fout antwoord!`);
+        }
+
+        updateArenaLeaderboard();
+        syncStateToStudents();
+      }, 3500);
+    }
+
+    function logArenaEvent(msg) {
+      const feed = document.getElementById('arena-event-feed-text');
+      if (feed) feed.innerText = msg;
+    }
+
+    function updateArenaLeaderboard() {
+      const list = document.getElementById('arena-ranking-list');
+      if (!list) return;
+
+      const sorted = [...State.players].sort((a,b) => {
+        if ((b.correctCount || 0) !== (a.correctCount || 0)) {
+          return (b.correctCount || 0) - (a.correctCount || 0);
+        }
+        return b.progress - a.progress;
+      });
+
+      list.innerHTML = '';
+      sorted.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = 'live-ranking-item';
+        row.style.borderLeftColor = p.color || '#fff';
+        const rankMedal = idx === 0 ? 'ðŸ¥‡' : idx === 1 ? 'ðŸ¥ˆ' : idx === 2 ? 'ðŸ¥‰' : `${idx + 1}.`;
+        const laps = p.correctCount || 0;
+        const pct = Math.min(100, Math.round((laps / State.totalLaps) * 100));
+
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:900; font-size:0.9rem;">${rankMedal}</span>
+            <span style="font-size:1.1rem;">${p.emoji || 'ðŸŽï¸'}</span>
+            <strong style="color:#fff; font-size:0.85rem;">${p.name.substring(0, 12)}</strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:70px; height:6px; background:rgba(255,255,255,0.12); border-radius:6px; overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background:${p.color || '#2ed573'};"></div>
+            </div>
+            <span style="font-family:var(--font-arcade); font-size:0.72rem; color:var(--gold);">${laps}/${State.totalLaps}</span>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function syncStateToStudents() {
+      const sorted = [...State.players].sort((a,b) => {
+        if ((b.correctCount || 0) !== (a.correctCount || 0)) return (b.correctCount || 0) - (a.correctCount || 0);
+        return b.progress - a.progress;
+      });
+
+      broadcastEvent('state-broadcast', {
+        players: sorted.map((p, idx) => ({
+          id: p.id,
+          name: p.name,
+          progress: Math.round(p.progress),
+          correctCount: p.correctCount || 0,
+          rank: idx + 1,
+          item: p.item
+        }))
+      });
     }
 
     // ==========================================
-    // PLAYER CONTROLLER LOGIC (Student Phone)
+    // AUTONOMOUS STUDENT RACER LOGIC
     // ==========================================
+    let studentDeck = [];
+    let studentQuestionIndex = 0;
+    let studentCorrectCount = 0;
+    let studentItem = null;
+
     function joinAsPlayer() {
       const name = document.getElementById('player-name-input').value.trim();
       const pin = document.getElementById('player-pin-input').value.trim();
-      if (!name) { alert('Vul alsjeblieft je naam in!'); return; }
+      if (!name) { alert('Vul alsjeblieft je naam of duo-naam in!'); return; }
 
       State.gamePin = pin || 'CIOS-2627';
       State.myPlayerId = `player-${Date.now()}`;
-      const char = MARIO_KART_CHARACTERS.find(c => c.id === selectedCharId);
+      const char = MARIO_KART_CHARACTERS.find(c => c.id === selectedCharId) || MARIO_KART_CHARACTERS[0];
 
       State.myPlayerInfo = {
         id: State.myPlayerId,
@@ -3116,453 +3061,332 @@ const QUESTIONS = {
       document.getElementById('player-lobby-screen').classList.remove('active');
       document.getElementById('player-race-screen').classList.add('active');
 
-      // Connect and broadcast once subscribed
       initRealtimeRoom(() => {
         broadcastEvent('player-join', State.myPlayerInfo);
-        const joinLoop = setInterval(() => {
-          if (State.raceFinished || State.currentQuestion) {
-            clearInterval(joinLoop);
-            return;
-          }
-          broadcastEvent('player-join', State.myPlayerInfo);
-        }, 2000);
       });
+    }
+
+    function getCountriesForCircuit(circuitKey) {
+      const pools = {
+        europa: ['nederland', 'spanje', 'duitsland', 'frankrijk', 'italie', 'verenigd_koninkrijk'],
+        cariben: ['aruba', 'bonaire', 'curacao', 'suriname', 'brazilie', 'colombia'],
+        safari: ['kenia', 'zuid_afrika', 'oeganda', 'indonesie', 'australie'],
+        world: Object.keys(gameQuestions)
+      };
+      return pools[circuitKey] || pools.world;
     }
 
     function handleGameStartedByHost(payload) {
       playSound('go');
-      alert('\u{1F3C1} DE GRAND PRIX GAAT VAN START! Bereid je voor!');
+      State.totalLaps = payload.totalLaps || 15;
+      State.circuit = payload.circuit || 'world';
+
+      // Assemble full deck for circuit
+      studentDeck = [];
+      const countries = getCountriesForCircuit(State.circuit);
+      countries.forEach(cKey => {
+        const cData = gameQuestions[cKey];
+        if (cData && cData.questions) {
+          cData.questions.forEach(q => {
+            studentDeck.push({
+              ...q,
+              country: cData.title || cKey.toUpperCase()
+            });
+          });
+        }
+      });
+
+      // Shuffle deck (Fisher-Yates)
+      for (let i = studentDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [studentDeck[i], studentDeck[j]] = [studentDeck[j], studentDeck[i]];
+      }
+
+      studentQuestionIndex = 0;
+      studentCorrectCount = 0;
+      studentItem = null;
+
+      document.getElementById('player-waiting-box').style.display = 'none';
+      document.getElementById('player-active-q-box').style.display = 'block';
+
+      loadStudentQuestion();
     }
 
-    function handleQuestionSync(payload) {
-      document.getElementById('player-q-country').innerText = payload.country;
-      document.getElementById('player-q-prompt').innerText = payload.question;
+    function loadStudentQuestion() {
+      if (studentCorrectCount >= State.totalLaps) {
+        // Winner on phone!
+        document.getElementById('player-active-q-box').style.display = 'none';
+        document.getElementById('player-winner-box').style.display = 'block';
+        playSound('fanfare');
+        broadcastEvent('player-win', {
+          playerId: State.myPlayerId,
+          name: State.myPlayerInfo.name,
+          charId: State.myPlayerInfo.charId
+        });
+        return;
+      }
+
+      const q = studentDeck[studentQuestionIndex % studentDeck.length];
+      if (!q) return;
+
+      document.getElementById('player-slip-penalty').style.display = 'none';
+      document.getElementById('player-q-country').innerText = `ðŸŒ ${q.country} | Sportcultuur`;
+      document.getElementById('player-q-lap-badge').innerText = `VRAAG ${studentCorrectCount + 1} / ${State.totalLaps}`;
+      document.getElementById('player-q-prompt').innerText = q.question;
 
       const grid = document.getElementById('player-options-grid');
       grid.innerHTML = '';
 
       ['A', 'B', 'C'].forEach(l => {
-        if (payload.options && payload.options[l]) {
+        if (q.options && q.options[l]) {
           const btn = document.createElement('button');
           btn.className = 'opt-live-btn';
-          btn.style.padding = '14px';
-          btn.innerHTML = `<strong style="color:var(--gold); font-size:1.1rem; width:28px;">${l}</strong> <span>${payload.options[l]}</span>`;
-          btn.onclick = () => submitPlayerAnswer(l);
+          btn.innerHTML = `<strong style="color:var(--gold); font-size:1.1rem; width:28px;">${l}</strong> <span>${q.options[l]}</span>`;
+          btn.onclick = () => handleStudentAnswer(l, q.correct);
           grid.appendChild(btn);
         }
       });
     }
 
-    function submitPlayerAnswer(letter) {
-      document.querySelectorAll('#player-options-grid button').forEach(b => {
-        b.disabled = true;
-        if (b.innerText.trim().startsWith(letter)) {
-          b.style.borderColor = 'var(--cyan)';
-          b.style.background = 'rgba(0, 210, 211, 0.25)';
-          b.style.boxShadow = '0 0 15px rgba(0, 210, 211, 0.5)';
-        } else {
-          b.style.opacity = '0.4';
+    function handleStudentAnswer(selectedLetter, correctLetter) {
+      const buttons = document.querySelectorAll('#player-options-grid button');
+      buttons.forEach(b => b.disabled = true);
+
+      const isCorrect = (selectedLetter === correctLetter);
+
+      if (isCorrect) {
+        playSound('correct');
+        playSound('turbo');
+        studentCorrectCount++;
+
+        // Visual check
+        buttons.forEach(b => {
+          if (b.innerText.trim().startsWith(selectedLetter)) b.classList.add('correct');
+        });
+
+        // Update Phone HUD
+        const pct = Math.min(100, Math.round((studentCorrectCount / State.totalLaps) * 100));
+        document.getElementById('player-card-progress').innerText = `${studentCorrectCount} / ${State.totalLaps} Goed`;
+        document.getElementById('player-progress-fill').style.width = `${pct}%`;
+
+        // Broadcast progress to Digibord
+        broadcastEvent('player-progress', {
+          playerId: State.myPlayerId,
+          name: State.myPlayerInfo.name,
+          correctCount: studentCorrectCount,
+          progress: pct,
+          boosted: true
+        });
+
+        // Item award check (40% chance or every 3 correct answers)
+        if (!studentItem && (studentCorrectCount % 3 === 0 || Math.random() < 0.4)) {
+          awardStudentItem();
         }
-      });
-      broadcastEvent('answer-submit', {
-        playerId: State.myPlayerId,
-        answer: letter
-      });
+
+        // Advance to next question after 0.4s
+        setTimeout(() => {
+          studentQuestionIndex++;
+          loadStudentQuestion();
+        }, 400);
+
+      } else {
+        // Wrong answer -> 2s banana slip penalty
+        playSound('wrong');
+        playSound('slip');
+
+        buttons.forEach(b => {
+          if (b.innerText.trim().startsWith(selectedLetter)) b.classList.add('wrong');
+          if (b.innerText.trim().startsWith(correctLetter)) b.classList.add('correct');
+        });
+
+        document.getElementById('player-slip-penalty').style.display = 'block';
+
+        broadcastEvent('player-spin', {
+          playerId: State.myPlayerId,
+          name: State.myPlayerInfo.name
+        });
+
+        setTimeout(() => {
+          studentQuestionIndex++;
+          loadStudentQuestion();
+        }, 2000);
+      }
+    }
+
+    function awardStudentItem() {
+      const pool = ['mushroom', 'banana', 'shell', 'blueshell', 'star'];
+      const itemId = pool[Math.floor(Math.random() * pool.length)];
+      studentItem = POWER_UPS.find(p => p.id === itemId);
+
+      const itemBtn = document.getElementById('player-item-btn');
+      itemBtn.classList.add('has-item');
+      document.getElementById('player-item-emoji').innerText = studentItem.emoji;
+      document.getElementById('player-item-header').innerText = `${studentItem.name.toUpperCase()} (TIK OM IN TE ZETTEN!)`;
+      document.getElementById('player-item-text').innerText = studentItem.desc;
+
       playSound('turbo');
     }
 
+    function deployStudentItem() {
+      if (!studentItem) return;
+
+      playSound('turbo');
+      const itemToDeploy = studentItem;
+      studentItem = null;
+
+      const itemBtn = document.getElementById('player-item-btn');
+      itemBtn.classList.remove('has-item');
+      document.getElementById('player-item-emoji').innerText = 'â“';
+      document.getElementById('player-item-header').innerText = 'SPECIALE ITEM BOX';
+      document.getElementById('player-item-text').innerText = 'Beantwoord vragen snel goed om items te winnen!';
+
+      broadcastEvent('item-deploy', {
+        fromPlayerId: State.myPlayerId,
+        fromName: State.myPlayerInfo.name,
+        charId: State.myPlayerInfo.charId,
+        itemType: itemToDeploy.id
+      });
+    }
+
     // ==========================================
-    // ANSWER PROCESSING (Host on Digibord)
+    // HOST EVENT RECEIVERS (DIGIBORD LIVE)
     // ==========================================
-    function handlePlayerAnswer(payload) {
+    function handlePlayerProgressFromStudent(payload) {
       const player = State.players.find(p => p.id === payload.playerId);
-      if (!player || !State.currentQuestion) return;
+      if (!player) return;
 
-      State.answersThisRound = State.answersThisRound || new Set();
-      State.answersThisRound.add(payload.playerId);
+      player.correctCount = payload.correctCount;
+      player.progress = payload.progress;
+      player.boosted = true;
+      setTimeout(() => player.boosted = false, 1500);
 
-      const isCorrect = (payload.answer === State.currentQuestion.correct);
-
-      if (isCorrect) {
-        player.score += 100;
-        player.streak++;
-
-        let meters = (100 / State.totalLaps);
-        if (State.timerSec > 15) meters *= 1.25;
-
-        if (player.starRounds > 0) {
-          meters *= 2;
-          player.starRounds--;
-        }
-
-        player.progress = Math.min(95, player.progress + meters);
-        player.boosted = true;
-        setTimeout(() => player.boosted = false, 1200);
-
-        if (State.allowItems && !player.item) {
-          rollPlayerItem(player);
-        }
-
-        logArenaEvent(`\u{26A1} ${player.name} (${player.charId.toUpperCase()}) antwoordt GOED (+${Math.round(meters*10)}m)!`);
-      } else {
-        player.streak = 0;
-        player.spinning = true;
-        setTimeout(() => player.spinning = false, 800);
-        logArenaEvent(`\u{1F34C} ${player.name} slipt op een fout antwoord!`);
-      }
-
-      const humanRacers = State.players.filter(p => !p.id.startsWith('bot-'));
-      const ansCounter = document.getElementById('arena-answers-count');
-      if (ansCounter) {
-        ansCounter.innerHTML = `<i class="fa-solid fa-users"></i> ${State.answersThisRound.size} / ${humanRacers.length} binnen`;
-      }
+      logArenaEvent(`âš¡ ${player.name} (${(player.charId || 'RACER').toUpperCase()}) pakt een turbo sprint! (${player.correctCount}/${State.totalLaps})`);
 
       updateArenaLeaderboard();
       syncStateToStudents();
 
-      if (humanRacers.length > 0 && State.answersThisRound.size >= humanRacers.length) {
-        clearInterval(State.timerInterval);
-        setTimeout(() => handleRoundTimeout(), 1000);
+      if (player.correctCount >= State.totalLaps) {
+        finishGrandPrixHost(player);
       }
     }
 
-    function rollPlayerItem(player) {
-      const sorted = [...State.players].sort((a,b) => b.progress - a.progress);
-      const rank = sorted.findIndex(p => p.id === player.id) + 1;
+    function handlePlayerSpinFromStudent(payload) {
+      const player = State.players.find(p => p.id === payload.playerId);
+      if (!player) return;
 
-      let item = null;
-      if (rank >= 7 && State.allowBlueShell && Math.random() < 0.45) {
-        item = POWER_UPS.find(p => p.id === 'blueshell');
-      } else {
-        const pool = POWER_UPS.filter(p => p.id !== 'blueshell');
-        item = pool[Math.floor(Math.random() * pool.length)];
-      }
-
-      player.item = item;
-      logArenaEvent(`\u{1F381} ${player.name} ontving een [${item.emoji} ${item.name}]!`);
+      player.spinning = true;
+      setTimeout(() => player.spinning = false, 2000);
+      logArenaEvent(`ðŸŒ ${player.name} slipt op een fout antwoord! 360Â° spin!`);
     }
 
-    function syncStateToStudents() {
-      const sorted = [...State.players].sort((a,b) => b.progress - a.progress);
-      broadcastEvent('state-broadcast', {
-        players: sorted.map((p, idx) => ({
-          id: p.id,
-          name: p.name,
-          progress: Math.round(p.progress),
-          rank: idx + 1,
-          item: p.item
-        }))
-      });
+    function handlePlayerWinFromStudent(payload) {
+      const player = State.players.find(p => p.id === payload.playerId);
+      finishGrandPrixHost(player || payload);
+    }
+
+    function handleItemDeployed(payload) {
+      const sender = State.players.find(p => p.id === payload.fromPlayerId);
+      const name = sender ? sender.name : (payload.fromName || 'Racer');
+
+      switch (payload.itemType) {
+        case 'mushroom':
+          if (sender) {
+            sender.progress = Math.min(100, sender.progress + 6);
+            sender.boosted = true;
+            setTimeout(() => sender.boosted = false, 1600);
+          }
+          playSound('turbo');
+          logArenaEvent(`ðŸ„ ${name} zet een Turbo Paddenstoel in en schiet vooruit!`);
+          break;
+
+        case 'banana':
+          const victims = State.players.filter(p => p.id !== payload.fromPlayerId);
+          if (victims.length > 0) {
+            const victim = victims[Math.floor(Math.random() * victims.length)];
+            victim.spinning = true;
+            setTimeout(() => victim.spinning = false, 2200);
+            playSound('slip');
+            logArenaEvent(`ðŸŒ ${name} gooit een banaan! ${victim.name} slipt 360Â°!`);
+          }
+          break;
+
+        case 'shell':
+          const sorted = [...State.players].sort((a,b) => b.progress - a.progress);
+          const sIdx = sorted.findIndex(p => p.id === payload.fromPlayerId);
+          if (sIdx > 0) {
+            const target = sorted[sIdx - 1];
+            target.spinning = true;
+            setTimeout(() => target.spinning = false, 2200);
+            playSound('shell');
+            logArenaEvent(`ðŸ¢ ${name} raakt ${target.name} met een Groen Schild!`);
+          }
+          break;
+
+        case 'blueshell':
+          const leader = [...State.players].sort((a,b) => b.progress - a.progress)[0];
+          if (leader) {
+            leader.spinning = true;
+            leader.progress = Math.max(0, leader.progress - 5);
+            setTimeout(() => leader.spinning = false, 3200);
+            playSound('wrong');
+            logArenaEvent(`ðŸ¢ðŸ’™ BLAUWE SCHILD! ${name} raakt koploper ${leader.name}!`);
+          }
+          break;
+
+        case 'star':
+          if (sender) {
+            sender.progress = Math.min(100, sender.progress + 8);
+            sender.boosted = true;
+            setTimeout(() => sender.boosted = false, 3000);
+          }
+          playSound('fanfare');
+          logArenaEvent(`â­ ${name} activeert STAR POWER! Onkwetsbaar & dubbele turbo!`);
+          break;
+      }
+
+      updateArenaLeaderboard();
+      syncStateToStudents();
     }
 
     function handleStateSyncFromHost(payload) {
+      if (!payload || !payload.players) return;
       const me = payload.players.find(p => p.id === State.myPlayerId);
       if (me) {
         document.getElementById('player-card-rank').innerText = `P${me.rank}`;
-        document.getElementById('player-card-progress').innerText = `${me.progress}% van de baan`;
-
-        const itemBtn = document.getElementById('player-item-btn');
-        if (me.item) {
-          document.getElementById('player-item-emoji').innerText = me.item.emoji;
-          const hdr = document.getElementById('player-item-header');
-          if (hdr) hdr.innerText = `${me.item.name.toUpperCase()} KLAAR!`;
-          document.getElementById('player-item-text').innerText = 'ðŸ”¥ TIK HIER OM IN TE ZETTEN!';
-          itemBtn.style.background = 'linear-gradient(135deg, #f59e0b, #ef4444)';
-          itemBtn.style.borderColor = '#fef08a';
-          itemBtn.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.7)';
-          itemBtn.onclick = () => {
-            broadcastEvent('item-deploy', { playerId: State.myPlayerId, itemId: me.item.id });
-            document.getElementById('player-item-emoji').innerText = '\u{2753}';
-            if (hdr) hdr.innerText = 'ITEM INGEZET!';
-            document.getElementById('player-item-text').innerText = 'Even wachten op volgend item...';
-            itemBtn.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
-            itemBtn.style.borderColor = 'rgba(255,255,255,0.25)';
-            itemBtn.style.boxShadow = 'none';
-            itemBtn.onclick = null;
-          };
-        } else {
-          document.getElementById('player-item-emoji').innerText = '\u{2753}';
-          const hdr = document.getElementById('player-item-header');
-          if (hdr) hdr.innerText = 'SPECIALE ITEM BOX';
-          document.getElementById('player-item-text').innerText = 'Beantwoord vragen snel goed om items te winnen!';
-          itemBtn.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
-          itemBtn.style.borderColor = 'rgba(255,255,255,0.25)';
-          itemBtn.style.boxShadow = 'none';
-          itemBtn.onclick = null;
-        }
       }
     }
 
-    function handlePlayerItem(payload) {
-      const player = State.players.find(p => p.id === payload.playerId);
-      if (!player || !player.item) return;
-      const item = player.item;
-      player.item = null;
-
-      switch (item.id) {
-        case 'mushroom':
-          player.progress = Math.min(95, player.progress + 14);
-          player.boosted = true;
-          setTimeout(() => player.boosted = false, 1200);
-          playSound('turbo');
-          logArenaEvent(`\u{1F344} TURBO BOOST! ${player.name} schiet vooruit!`);
-          break;
-        case 'banana':
-          const leader = [...State.players].sort((a,b) => b.progress - a.progress)[0];
-          if (leader.id !== player.id) {
-            leader.progress = Math.max(5, leader.progress - 10);
-            leader.spinning = true;
-            setTimeout(() => leader.spinning = false, 800);
-            playSound('slip');
-            logArenaEvent(`\u{1F34C} BANAAN! ${player.name} liet ${leader.name} slippen (-100m)!`);
-          }
-          break;
-        case 'shell':
-          player.progress = Math.min(95, player.progress + 10);
-          playSound('turbo');
-          logArenaEvent(`\u{1F422} GROEN SCHILD! ${player.name} passeert een rivaal!`);
-          break;
-        case 'blueshell':
-          const rank1 = [...State.players].sort((a,b) => b.progress - a.progress)[0];
-          rank1.progress = Math.max(5, rank1.progress - 16);
-          rank1.spinning = true;
-          setTimeout(() => rank1.spinning = false, 1000);
-          playSound('blueshell');
-          logArenaEvent(`\u{1F499} BLAUWE SCHILD INSLAG! Koploper ${rank1.name} werd geraakt (-160m)!`);
-          break;
-        case 'star':
-          player.starRounds = 2;
-          playSound('turbo');
-          logArenaEvent(`\u{1F31F} STAR POWER geactiveerd voor ${player.name}!`);
-          break;
-      }
-
-      updateArenaLeaderboard();
-      syncStateToStudents();
-    }
-
-    function updateArenaLeaderboard() {
-      const sorted = [...State.players].sort((a,b) => (b.progress * 100 + b.score) - (a.progress * 100 + a.score));
-      const list = document.getElementById('arena-ranking-list');
-      list.innerHTML = '';
-
-      sorted.forEach((p, idx) => {
-        const item = document.createElement('div');
-        item.className = 'live-ranking-item';
-        item.style.borderLeftColor = p.color;
-        item.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-family:var(--font-arcade); font-size:0.75rem; color:var(--gold); width:20px;">P${idx + 1}</span>
-            <span>${p.emoji}</span>
-            <strong style="color:${p.color};">${p.name}</strong>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            ${p.item ? `<span>${p.item.emoji}</span>` : ''}
-            <span style="font-family:var(--font-arcade); font-size:0.75rem; color:var(--accent);">${Math.round(p.progress)}%</span>
-          </div>
-        `;
-        list.appendChild(item);
-      });
-
-      if (sorted.length > 0) {
-        document.getElementById('arena-leader-tag').innerText = `P1: ${sorted[0].name} (${sorted[0].charId.toUpperCase()})`;
-      }
-    }
-
-    function logArenaEvent(msg) {
-      const feed = document.getElementById('arena-event-feed');
-      const div = document.createElement('div');
-      div.style.marginBottom = '3px';
-      div.innerHTML = msg;
-      feed.prepend(div);
-    }
-
-    function showFeedbackModal(isCorrect, explanation) {
-      const modal = document.getElementById('feedback-modal');
-      document.getElementById('feedback-icon').innerHTML = isCorrect ? '&#x26A1;&#x1F4A8;' : '&#x1F34C;&#x1F4A5;';
-      document.getElementById('feedback-title').innerText = isCorrect ? 'SUPER SPRINT!' : 'SLIPPER OP HET ASFALT!';
-      document.getElementById('feedback-title').style.color = isCorrect ? 'var(--accent)' : 'var(--primary)';
-      document.getElementById('feedback-text').innerHTML = `<strong>Toelichting:</strong><br>${explanation || "Blijf scherp op de sportcultuur!"}`;
-
-      modal.classList.add('active');
-      document.getElementById('feedback-next-btn').onclick = () => {
-        modal.classList.remove('active');
-        State.currentLap++;
-        nextHostTurn();
-      };
-    }
-
-    // ==========================================
-    // PODIUM & CERTIFICATE
-    // ==========================================
-    function finishGrandPrixHost() {
+    function finishGrandPrixHost(winner) {
+      if (State.raceFinished) return;
       State.raceFinished = true;
-      clearInterval(State.timerInterval);
+      if (State.botInterval) clearInterval(State.botInterval);
 
-      document.getElementById('host-race-screen').classList.remove('active');
-      document.getElementById('podium-screen').classList.add('active');
-
-      const sorted = [...State.players].sort((a,b) => (b.progress * 100 + b.score) - (a.progress * 100 + a.score));
       stopRaceBGM();
-      playSound('victory');
-      startConfetti();
+      playSound('fanfare');
 
-      if (sorted[0]) {
-        document.getElementById('podium-1-emoji').innerText = sorted[0].emoji;
-        document.getElementById('podium-1-name').innerText = sorted[0].name;
-      }
-      if (sorted[1]) {
-        document.getElementById('podium-2-emoji').innerText = sorted[1].emoji;
-        document.getElementById('podium-2-name').innerText = sorted[1].name;
-      }
-      if (sorted[2]) {
-        document.getElementById('podium-3-emoji').innerText = sorted[2].emoji;
-        document.getElementById('podium-3-name').innerText = sorted[2].name;
-      }
-
-      document.getElementById('podium-cert-btn').onclick = () => {
-        alert(`Kampioenen Certificaat voor: ${sorted[0].name} (${sorted[0].charId})! Druk op Ctrl+P om af te drukken.`);
-        window.print();
-      };
-    }
-
-    function startConfetti() {
-      const canvas = document.getElementById('confetti-canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const particles = [];
-      const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#ffffff'];
-      for (let i = 0; i < 160; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height - canvas.height,
-          size: Math.random() * 8 + 4,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          speedY: Math.random() * 4 + 2,
-          speedX: Math.random() * 2 - 1
-        });
-      }
-
-      let frame = 0;
-      function loop() {
-        if (frame > 220) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-          p.y += p.speedY;
-          p.x += p.speedX;
-          ctx.fillStyle = p.color;
-          ctx.fillRect(p.x, p.y, p.size, p.size);
-        });
-        frame++;
-        requestAnimationFrame(loop);
-      }
-      loop();
-    }
-
-    // ==========================================
-    // QUESTIONS EDITOR SETUP
-    // ==========================================
-    function setupQuestionsEditor() {
-      const filter = document.getElementById('editor-country-filter');
-      filter.innerHTML = '';
-      Object.keys(gameQuestions).forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k;
-        opt.innerText = gameQuestions[k].title || k;
-        filter.appendChild(opt);
+      const sorted = [...State.players].sort((a,b) => {
+        if ((b.correctCount || 0) !== (a.correctCount || 0)) return (b.correctCount || 0) - (a.correctCount || 0);
+        return b.progress - a.progress;
       });
 
-      filter.onchange = () => renderEditorQuestions(filter.value);
-      renderEditorQuestions(filter.value);
+      const p1 = sorted[0] || winner || { name: 'Kampioen', emoji: 'ðŸ„' };
+      const p2 = sorted[1] || { name: 'Zilveren Racer', emoji: 'ðŸŽï¸' };
+      const p3 = sorted[2] || { name: 'Bronzen Racer', emoji: 'ðŸ¢' };
 
-      document.getElementById('editor-open-btn').onclick = () => {
-        setupQuestionsEditor();
-        document.getElementById('questions-editor-modal').classList.add('active');
-      };
-      document.getElementById('editor-close-btn').onclick = () => {
-        document.getElementById('questions-editor-modal').classList.remove('active');
-      };
+      document.getElementById('podium-1-name').innerText = p1.name;
+      document.getElementById('podium-1-emoji').innerText = p1.emoji || 'ðŸ„';
 
-      document.getElementById('save-questions-btn').onclick = () => {
-        localStorage.setItem('CIOS_GLOBETROTTER_QUESTIONS', JSON.stringify(gameQuestions));
-        alert('Vragen opgeslagen in de browser!');
-      };
-      document.getElementById('export-questions-btn').onclick = () => {
-        const blob = new Blob([JSON.stringify(gameQuestions, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'Globetrotter_CIOS_Vragen.json';
-        a.click();
-      };
-      document.getElementById('import-questions-btn').onclick = () => document.getElementById('import-file-input').click();
-      document.getElementById('import-file-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          try {
-            gameQuestions = JSON.parse(evt.target.result);
-            localStorage.setItem('CIOS_GLOBETROTTER_QUESTIONS', JSON.stringify(gameQuestions));
-            setupQuestionsEditor();
-            alert('Vragen succesvol geÃ¯mporteerd!');
-          } catch (err) { alert('Fout: ' + err.message); }
-        };
-        reader.readAsText(file);
-      };
-      document.getElementById('reset-questions-btn').onclick = () => {
-        if (confirm('Vragen terugzetten naar origineel?')) {
-          localStorage.removeItem('CIOS_GLOBETROTTER_QUESTIONS');
-          loadActiveQuestions();
-          setupQuestionsEditor();
-          alert('Vragen hersteld!');
-        }
-      };
+      document.getElementById('podium-2-name').innerText = p2.name;
+      document.getElementById('podium-2-emoji').innerText = p2.emoji || 'ðŸŽï¸';
+
+      document.getElementById('podium-3-name').innerText = p3.name;
+      document.getElementById('podium-3-emoji').innerText = p3.emoji || 'ðŸ¢';
+
+      setTimeout(() => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('podium-screen').classList.add('active');
+      }, 1200);
     }
-
-    function renderEditorQuestions(countryKey) {
-      const container = document.getElementById('editor-questions-list');
-      container.innerHTML = '';
-      const cData = gameQuestions[countryKey];
-      if (!cData || !cData.questions) return;
-
-      cData.questions.forEach((q, idx) => {
-        const card = document.createElement('div');
-        card.style.background = '#0e1526';
-        card.style.border = '1px solid rgba(255,255,255,0.1)';
-        card.style.borderRadius = '10px';
-        card.style.padding = '14px';
-        card.style.marginBottom = '12px';
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <strong style="color:var(--gold);">Vraag #${idx + 1} (${cData.title})</strong>
-            <button class="header-btn" style="color:#ff4757; padding:4px 8px;" onclick="deleteQ('${countryKey}', ${idx})">Verwijder</button>
-          </div>
-          <input type="text" class="form-input" style="margin-bottom:8px;" value="${q.question.replace(/"/g, '&quot;')}" onchange="editQText('${countryKey}', ${idx}, this.value)">
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
-            <input type="text" class="form-input" value="${q.options.A ? q.options.A.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'A', this.value)" placeholder="Optie A">
-            <input type="text" class="form-input" value="${q.options.B ? q.options.B.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'B', this.value)" placeholder="Optie B">
-            <input type="text" class="form-input" value="${q.options.C ? q.options.C.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'C', this.value)" placeholder="Optie C">
-          </div>
-          <div style="display:flex; gap:10px;">
-            <select class="form-select" style="max-width:90px;" onchange="editQCorrect('${countryKey}', ${idx}, this.value)">
-              <option value="A" ${q.correct === 'A' ? 'selected' : ''}>A</option>
-              <option value="B" ${q.correct === 'B' ? 'selected' : ''}>B</option>
-              <option value="C" ${q.correct === 'C' ? 'selected' : ''}>C</option>
-            </select>
-            <input type="text" class="form-input" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}" onchange="editQExpl('${countryKey}', ${idx}, this.value)" placeholder="Toelichting...">
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    window.editQText = (c, i, v) => gameQuestions[c].questions[i].question = v;
-    window.editQOpt = (c, i, o, v) => gameQuestions[c].questions[i].options[o] = v;
-    window.editQCorrect = (c, i, v) => gameQuestions[c].questions[i].correct = v;
-    window.editQExpl = (c, i, v) => gameQuestions[c].questions[i].explanation = v;
-    window.deleteQ = (c, i) => { gameQuestions[c].questions.splice(i, 1); renderEditorQuestions(c); };
 
     // ==========================================
     // INITIALIZATION & EVENT HANDLERS
@@ -3590,44 +3414,46 @@ const QUESTIONS = {
         soundEnabled = !soundEnabled;
         document.getElementById('sound-status').innerText = soundEnabled ? 'Aan' : 'Uit';
         document.getElementById('audio-toggle-btn').querySelector('i').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
-        if (!soundEnabled) {
-          stopRaceBGM();
-        } else if (State.role === 'host' && document.getElementById('host-race-screen').classList.contains('active')) {
-          startRaceBGM();
+        if (!soundEnabled) stopRaceBGM();
+        else if (State.role === 'host' && document.getElementById('host-race-screen').classList.contains('active')) startRaceBGM();
+      };
+
+      document.getElementById('start-grandprix-host-btn').onclick = startHostGrandPrix;
+      document.getElementById('add-bots-btn').onclick = addBots;
+
+      document.getElementById('toggle-view-mode-btn').onclick = toggleTrackViewMode;
+      document.getElementById('toggle-cam-mode-btn').onclick = toggleCameraMode;
+      document.getElementById('arena-finish-manual-btn').onclick = () => finishGrandPrixHost();
+
+      document.getElementById('player-join-btn').onclick = joinAsPlayer;
+      document.getElementById('player-item-btn').onclick = deployStudentItem;
+
+      // Jokers
+      document.getElementById('player-joker-5050').onclick = () => {
+        const btn = document.getElementById('player-joker-5050');
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.style.opacity = '0.3';
+        const buttons = Array.from(document.querySelectorAll('#player-options-grid button'));
+        if (buttons.length > 2) {
+          buttons[buttons.length - 1].disabled = true;
+          buttons[buttons.length - 1].style.opacity = '0.2';
+          buttons[buttons.length - 1].style.textDecoration = 'line-through';
+          playSound('correct');
         }
       };
 
-      const joker5050 = document.getElementById('player-joker-5050');
-      if (joker5050) {
-        joker5050.onclick = () => {
-          if (joker5050.disabled) return;
-          joker5050.disabled = true;
-          joker5050.style.opacity = '0.3';
-          const buttons = Array.from(document.querySelectorAll('#player-options-grid button'));
-          if (buttons.length > 2) {
-            let disabledCount = 0;
-            buttons.forEach(btn => {
-              if (disabledCount < 2 && Math.random() < 0.75) {
-                btn.disabled = true;
-                btn.style.opacity = '0.2';
-                btn.style.textDecoration = 'line-through';
-                disabledCount++;
-              }
-            });
-            playSound('correct');
-          }
-        };
-      }
-
-      const jokerTime = document.getElementById('player-joker-time');
-      if (jokerTime) {
-        jokerTime.onclick = () => {
-          if (jokerTime.disabled) return;
-          jokerTime.disabled = true;
-          jokerTime.style.opacity = '0.3';
-          playSound('turbo');
-          alert('â±ï¸ +20s Extra bedenktijd ingezet!');
-        };
+      document.getElementById('player-joker-hint').onclick = () => {
+        const btn = document.getElementById('player-joker-hint');
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.style.opacity = '0.3';
+        const q = studentDeck[studentQuestionIndex % studentDeck.length];
+        if (q && q.explanation) {
+          alert(`ðŸ’¡ Tip: ${q.explanation}`);
+        } else {
+          alert('ðŸ’¡ Tip: Denk goed aan de culturele context van het land!');
+        }
       };
 
       document.getElementById('fullscreen-btn').onclick = () => {
@@ -3636,27 +3462,9 @@ const QUESTIONS = {
       };
 
       document.getElementById('restart-game-btn').onclick = () => {
-        if (confirm('Spel opnieuw instellen?')) location.reload();
+        if (confirm('Spel herstarten?')) location.reload();
       };
       document.getElementById('podium-rematch-btn').onclick = () => location.reload();
-
-      document.getElementById('start-grandprix-host-btn').onclick = startHostGrandPrix;
-      document.getElementById('add-bots-btn').onclick = addBots;
-
-      const toggleViewBtn = document.getElementById('toggle-view-mode-btn');
-      if (toggleViewBtn) toggleViewBtn.onclick = toggleTrackViewMode;
-
-      const skipBtn = document.getElementById('arena-skip-timer-btn');
-      if (skipBtn) {
-        skipBtn.onclick = () => {
-          clearInterval(State.timerInterval);
-          handleRoundTimeout();
-        };
-      }
-
-      document.getElementById('player-join-btn').onclick = joinAsPlayer;
-
-      setupQuestionsEditor();
     });
   </script>
 </body>
