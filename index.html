@@ -1,201 +1,2995 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Globetrotter CIOS IBPV Quiz App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Globetrotter CIOS - Mario Kart Grand Prix Live</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Leaflet GIS Map CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Supabase Cloud Sync CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-dark: #090e18;
+      --bg-card: #141c2e;
+      --bg-card-hover: #1c2742;
+      --primary: #ff4757;
+      --accent: #2ed573;
+      --gold: #ffa502;
+      --cyan: #1e90ff;
+      --purple: #9b59b6;
+      --text-main: #f1f2f6;
+      --text-muted: #a4b0be;
+      --font-arcade: 'Press Start 2P', monospace;
+      --font-title: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: radial-gradient(circle at 50% 15%, #18233c 0%, #080c14 100%);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* HEADER */
+    .gp-header {
+      background: rgba(13, 20, 36, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid rgba(255, 71, 87, 0.4);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+    .header-branding {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .cios-logo-badge {
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .cios-logo-badge:hover { transform: translateY(-1px); }
+    .cios-logo-img {
+      height: 36px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+      display: block;
+    }
+    .brand-title h1 {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ff4757, #ffa502, #2ed573);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-title span {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .header-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .header-btn:hover {
+      background: rgba(255, 71, 87, 0.2);
+      border-color: #ff4757;
+      transform: translateY(-1px);
+    }
+
+    /* CONTAINERS & SCREENS */
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; flex: 1; }
+
+    /* ROLE SWITCH BAR */
+    .role-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,0.04);
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .role-pill {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.15);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .role-pill.active {
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: #fff;
+      border-color: #ff4757;
+      box-shadow: 0 4px 15px rgba(255,71,87,0.4);
+    }
+
+    /* LOBBY / SETUP STYLING */
+    .lobby-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 960px) {
+      .lobby-grid { grid-template-columns: 1fr; }
+    }
+    .lobby-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .lobby-card h2 {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+    .form-select, .form-input {
+      width: 100%;
+      background: #0d1424;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: var(--font-body);
+      outline: none;
+    }
+    .form-select:focus, .form-input:focus { border-color: #ff4757; }
+
+    /* DIGIBORD LIVE QR / PIN BOX */
+    .pin-display-box {
+      background: linear-gradient(135deg, #10182b, #192542);
+      border: 2px dashed var(--gold);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .pin-code-large {
+      font-family: var(--font-arcade);
+      font-size: 2.2rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-shadow: 0 0 15px rgba(255,165,2,0.6);
+      margin: 8px 0;
+    }
+
+    /* PLAYER ROSTER IN DIGIBORD LOBBY */
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+      padding: 6px;
+      background: #0a0f1c;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .roster-kart-card {
+      background: #141c2e;
+      border: 2px solid #3742fa;
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .roster-emoji { font-size: 1.8rem; }
+    .roster-name { font-size: 0.82rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .roster-char { font-size: 0.68rem; color: var(--gold); font-weight: bold; }
+
+    /* START RACE BUTTON */
+    .start-race-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255,71,87,0.5);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .start-race-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(255,71,87,0.7);
+    }
+
+    /* STUDENT JOIN CARD */
+    .student-join-box {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .avatar-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+    }
+    .avatar-btn {
+      background: #0d1424;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 8px 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .avatar-btn:hover { border-color: var(--cyan); }
+    .avatar-btn.active {
+      border-color: var(--gold);
+      background: rgba(255,165,2,0.15);
+      box-shadow: 0 0 12px rgba(255,165,2,0.4);
+    }
+    .avatar-btn .emoji { font-size: 1.6rem; }
+    .avatar-btn .name { font-size: 0.7rem; font-weight: bold; color: #fff; }
+
+    /* =================== RACE ARENA (DIGIBORD) =================== */
+    .arena-topbar {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .checkpoint-tag {
+      background: linear-gradient(90deg, #1e90ff, #3742fa);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+
+    /* CANVAS TRACK CONTAINER */
+    .track-canvas-container {
+      background: #0a0f1c;
+      border: 2px solid #23314f;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 8px 30px rgba(0,0,0,0.6);
+      margin-bottom: 14px;
+      width: 100%;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #race-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* RACE INTERACTION (BOTTOM) */
+    .race-bottom-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 16px;
+      flex: 1;
+    }
+    @media (max-width: 960px) {
+      .race-bottom-grid { grid-template-columns: 1fr; }
+    }
+    .question-card-live {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .question-title-text {
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .options-live-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .opt-live-btn {
+      background: #0e1526;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      color: #f1f2f6;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+    .opt-live-btn:hover:not(:disabled) {
+      background: #17223b;
+      border-color: #3742fa;
+    }
+    .opt-live-btn.correct {
+      background: rgba(46, 213, 115, 0.2) !important;
+      border-color: #2ed573 !important;
+      color: #2ed573 !important;
+    }
+    .opt-live-btn.wrong {
+      background: rgba(255, 71, 87, 0.2) !important;
+      border-color: #ff4757 !important;
+      color: #ff4757 !important;
+    }
+
+    /* STUDENT CONTROLLER VIEW (ON PHONE) */
+    .player-view-container {
+      max-width: 520px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .player-hero-card {
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .player-rank-large {
+      font-family: var(--font-arcade);
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+    .player-item-trigger {
+      background: #0b111e;
+      border: 3px solid var(--accent);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      transition: all 0.2s;
+    }
+    .player-item-trigger:hover { transform: scale(1.03); box-shadow: 0 0 20px var(--accent); }
+
+    /* LEADERBOARD PANEL */
+    .leaderboard-panel {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .live-ranking-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0c1221;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      border-left: 4px solid #fff;
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal-card {
+      background: #141c2e;
+      border: 2px solid #3742fa;
+      border-radius: 18px;
+      max-width: 750px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* ITEM GUIDE GRID */
+    .item-guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    @media (max-width: 600px) {
+      .item-guide-grid { grid-template-columns: 1fr; }
+    }
+    .item-guide-row {
+      background: #0a0f1c;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .item-guide-emoji { font-size: 2rem; flex-shrink: 0; }
+    .item-guide-info strong { display: block; font-size: 0.9rem; color: var(--gold); margin-bottom: 2px; }
+    .item-guide-info p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 400;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ==================== START SCREEN ==================== -->
-  <div id="start-screen" class="screen active">
-    <div class="card glass start-card">
-      <div class="logo-container">
-        <img src="logo.png" alt="CIOS Zuidwest-NL Logo" class="cios-logo">
+  <!-- ==================== HEADER ==================== -->
+  <header class="gp-header">
+    <div class="header-branding">
+      <div class="cios-logo-badge">
+        <img src="data:image/png;base64,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" alt="CIOS Zuidwest-NL Logo" class="cios-logo-img" id="cios-logo">
       </div>
-      <h1 class="glow-text">Globetrotter CIOS</h1>
-      <h2 class="sub-glow">Buitenlandse Stage Quiz App</h2>
-      <p class="description">
-        Bereid je voor op jouw internationale BPV-avontuur! Reis over de 5 werelddelen, test je kennis over de lokale (sport)culturen en behaal je Globetrotter-certificaat.
-      </p>
-
-      <div class="input-group">
-        <label for="student-name">Naam Student:</label>
-        <input type="text" id="student-name" placeholder="Vul je naam in..." autocomplete="off">
+      <div class="brand-title">
+        <h1><span>&#x1F3CE;&#xFE0F;</span> GLOBETROTTER GP <span>&#x1F3C1;</span></h1>
+        <span>Live Mario Kart Stage Race | Digibord &amp; Studenten</span>
       </div>
-
-      <div class="avatar-selector">
-        <p class="label">Kies je Sport-Avatar:</p>
-        <div class="avatar-grid">
-          <div class="avatar-option active" data-avatar="🏃">
-            <span class="emoji">🏃</span>
-            <span class="title">Runner</span>
-          </div>
-          <div class="avatar-option" data-avatar="🏊">
-            <span class="emoji">🏊</span>
-            <span class="title">Swimmer</span>
-          </div>
-          <div class="avatar-option" data-avatar="🚴">
-            <span class="emoji">🚴</span>
-            <span class="title">Cyclist</span>
-          </div>
-          <div class="avatar-option" data-avatar="⚽">
-            <span class="emoji">⚽</span>
-            <span class="title">Footballer</span>
-          </div>
-        </div>
-      </div>
-
-      <button id="start-btn" class="btn primary-btn btn-glowing">
-        <i class="fa-solid fa-plane-departure"></i> Reis Beginnen
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" id="open-item-guide-btn" title="Bekijk werking van alle Mario Kart items!">
+        <i class="fa-solid fa-book-open text-warning"></i> Item Gids
+      </button>
+      <button class="header-btn" id="audio-toggle-btn" title="Geluid Aan/Uit">
+        <i class="fa-solid fa-volume-high"></i> Geluid: <span id="sound-status">Aan</span>
+      </button>
+      <button class="header-btn" id="editor-open-btn" title="Vragen &amp; Landen Aanpassen">
+        <i class="fa-solid fa-sliders"></i> Vragen Beheer
+      </button>
+      <button class="header-btn" id="fullscreen-btn" title="Volledig Scherm (Digibord)">
+        <i class="fa-solid fa-expand"></i> Scherm
+      </button>
+      <button class="header-btn" id="restart-game-btn" title="Reset Spel">
+        <i class="fa-solid fa-rotate-right"></i> Reset
       </button>
     </div>
-  </div>
+  </header>
 
-  <!-- ==================== MAIN GAME SCREEN ==================== -->
-  <div id="game-screen" class="screen">
-    <!-- Header -->
-    <header class="glass header-bar">
-      <div class="header-left">
-        <img src="logo.png" alt="CIOS Logo" class="cios-header-logo">
-        <span class="divider"></span>
-        <h1 class="header-title">Globetrotter IBPV</h1>
-      </div>
-      <div class="header-right">
-        <div class="student-info">
-          <span id="player-avatar-badge" class="badge-emoji">🏃</span>
-          <span id="player-name-badge" class="badge-name">Student</span>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="container">
+
+    <!-- ROLE SWITCHER (Bovenaan) -->
+    <div class="role-bar" id="role-selector-bar">
+      <button class="role-pill active" id="role-host-btn"><i class="fa-solid fa-tv"></i> Docent (Digibord Scherm)</button>
+      <button class="role-pill" id="role-player-btn"><i class="fa-solid fa-mobile-screen"></i> Student (Speel mee op Mobiel/Laptop)</button>
+    </div>
+
+    <!-- ==================== SCREEN 1A: DOCENT DIGIBORD LOBBY ==================== -->
+    <section id="host-lobby-screen" class="screen active">
+      <div class="lobby-grid">
+        
+        <!-- Left: Race Instellingen -->
+        <div class="lobby-card">
+          <h2><i class="fa-solid fa-flag-checkered text-danger"></i> 1. Grand Prix Instellingen</h2>
+
+          <div class="form-group">
+            <label for="circuit-select">Kies Grand Prix Circuit:</label>
+            <select id="circuit-select" class="form-select">
+              <option value="europa">&#x1F3C6; Europa Grand Prix (NL, Spanje, Duitsland, Frankrijk, Itali&euml;, VK)</option>
+              <option value="cariben">&#x1F334; Cariben &amp; Latijns-Amerika GP (Aruba, Bonaire, Cura&ccedil;ao, Suriname, etc.)</option>
+              <option value="safari">&#x1F981; Safari &amp; Oceani&euml; GP (Kenia, Zuid-Afrika, Oeganda, Indonesi&euml;, Australi&euml;)</option>
+              <option value="world" selected>&#x1F30D; Wereldkampioenschap All-Stars (Mix van alle 17 landen!)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="race-rounds">Race Lengte (Aantal Checkpoints/Rondes):</label>
+            <select id="race-rounds" class="form-select">
+              <option value="6">&#x1F3C1; Sprint Race (6 Checkpoints - ca. 15 min)</option>
+              <option value="10" selected>&#x1F3C6; Standaard Grand Prix (10 Checkpoints - ca. 25 min)</option>
+              <option value="16">&#x1F525; Endurance Grand Prix (16 Checkpoints - ca. 40 min)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Mario Kart Speciale Regels:</label>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.86rem; color:#dcdde1; margin-top:4px;">
+              <label><input type="checkbox" id="rule-items" checked> &#x1F344; Mario Kart Items (Paddenstoel, Banaan, Schild, Ster)</label>
+              <label><input type="checkbox" id="rule-blueshell" checked> &#x1F422;&#x1F499; Blue Shell Catch-up (P7-P12 kan koploper afremmen!)</label>
+              <label><input type="checkbox" id="rule-jokers" checked> &#x1F6E0;&#xFE0F; Pitstop Jokers (50/50 &amp; Bandenwissel extra tijd)</label>
+            </div>
+          </div>
+
+          <!-- Quick Test with AI Bots button -->
+          <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+            <button class="header-btn" id="add-bots-btn" style="width:100%; justify-content:center;">
+              <i class="fa-solid fa-robot"></i> Voeg AI Racers Toe (Direct lokaal testen zonder studenten)
+            </button>
+          </div>
         </div>
-        <button id="audio-toggle" class="btn icon-btn" title="Geluid Aan/Uit">
-          <i class="fa-solid fa-volume-high"></i>
+
+        <!-- Right: Live Pincode & Studenten Roster -->
+        <div class="lobby-card">
+          <h2><i class="fa-solid fa-users text-warning"></i> 2. Studenten Startgrid</h2>
+
+          <div class="pin-display-box">
+            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;">LAAT STUDENTEN INLOGGEN MET PIN:</span>
+            <div class="pin-code-large" id="host-pin-display">CIOS-2627</div>
+            <p style="font-size:0.8rem; color:#2ed573;">
+              <i class="fa-solid fa-signal"></i> Live Cloud Synchronisatie Actief
+            </p>
+          </div>
+
+          <p style="font-size:0.85rem; font-weight:bold; color:var(--text-muted); margin-bottom:8px;">
+            Aangemelde Racers (<span id="roster-count">0</span>):
+          </p>
+
+          <div class="roster-grid" id="roster-grid">
+            <!-- Dynamic roster cards of connected students -->
+          </div>
+
+          <button id="start-grandprix-host-btn" class="start-race-btn">
+            <i class="fa-solid fa-flag-checkered"></i> START DE GRAND PRIX !
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 1B: STUDENT CONTROLLER LOBBY ==================== -->
+    <section id="player-lobby-screen" class="screen">
+      <div class="student-join-box">
+        <h2 style="font-family:var(--font-title); font-size:1.4rem; color:#fff; text-align:center; margin-bottom:6px;"><i class="fa-solid fa-flag-checkered text-danger"></i> Doe Mee aan de Race! <i class="fa-solid fa-flag-checkered text-danger"></i></h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:20px;">
+          Vul je naam in, kies je Mario Kart avatar en race live mee tegen je klasgenoten!
+        </p>
+
+        <div class="form-group">
+          <label for="player-pin-input">Game PIN (vraag aan docent):</label>
+          <input type="text" id="player-pin-input" class="form-input" value="CIOS-2627" placeholder="bijv. CIOS-2627">
+        </div>
+
+        <div class="form-group">
+          <label for="player-name-input">Jouw Naam / Duo Naam:</label>
+          <input type="text" id="player-name-input" class="form-input" placeholder="bijv. Daan &amp; Sophie" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Kies jouw Mario Kart Karakter:</label>
+          <div class="avatar-picker-grid" id="avatar-picker-grid">
+            <!-- Dynamisch gevuld met 10+ Mario Kart karakters -->
+          </div>
+        </div>
+
+        <button id="player-join-btn" class="start-race-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> AANMELDEN VOOR DE RACE !
         </button>
       </div>
-    </header>
+    </section>
 
-    <div class="main-layout">
-      <!-- Sidebar / Controls -->
-      <aside class="sidebar glass">
-        <div class="sidebar-section">
-          <h3>Jouw Voortgang</h3>
-          <div class="progress-container">
-            <div class="progress-bar-outer">
-              <div id="progress-fill" style="width: 0%;"></div>
+    <!-- ==================== SCREEN 2A: DIGIBORD LIVE GRAND PRIX ARENA ==================== -->
+    <section id="host-race-screen" class="screen">
+      
+      <!-- Top info bar -->
+      <div class="arena-topbar">
+        <div style="display:flex; align-items:center; gap:10px; font-family:var(--font-arcade); font-size:0.9rem; color:var(--gold);">
+          <i class="fa-solid fa-flag-checkered"></i>
+          <span>CHECKPOINT <span id="arena-current-lap">1</span> / <span id="arena-total-laps">10</span></span>
+        </div>
+        <div class="checkpoint-tag" id="arena-checkpoint-tag">
+          &#x1F30D; Nederland - Start &amp; Kick-off
+        </div>
+        <div style="font-size:0.85rem; color:var(--text-muted); font-weight:bold;" id="arena-player-count-tag">
+          12 Racers op de baan
+        </div>
+      </div>
+
+      <!-- THE 2D MARIO KART CANVAS CIRCUIT -->
+      <div class="track-canvas-container">
+        <canvas id="race-canvas" width="1200" height="380"></canvas>
+      </div>
+
+      <!-- Bottom Grid: Current Question + Live Leaderboard -->
+      <div class="race-bottom-grid">
+        
+        <!-- Live Question on Digibord -->
+        <div class="question-card-live">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:0.88rem; font-weight:800; color:var(--cyan);" id="arena-q-topic">
+              &#x1F30D; Spanje | Didactiek &amp; Omgangsvormen
+            </span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-family:var(--font-arcade); font-size:1.1rem; color:var(--gold);" id="arena-timer-num">25</span>s
             </div>
-            <span id="progress-text">0 / 5 continenten bezocht</span>
+          </div>
+
+          <div class="question-title-text" id="arena-question-text">
+            Vraag wordt ingeladen...
+          </div>
+
+          <div class="options-live-grid" id="arena-options-container">
+            <!-- A, B, C buttons -->
+          </div>
+
+          <!-- Live Event Feed below Question -->
+          <div style="background:#090e18; border-radius:8px; padding:8px 12px; font-size:0.78rem; border:1px solid rgba(255,255,255,0.06); height:65px; overflow-y:auto;" id="arena-event-feed">
+            <div style="color:var(--text-muted);">&#x1F3C1; De lichten springen op groen!</div>
           </div>
         </div>
 
-        <div class="sidebar-section">
-          <h3>Score</h3>
-          <div class="score-display">
-            <i class="fa-solid fa-trophy"></i>
-            <span id="total-score">0</span> <span class="pts">punten</span>
+        <!-- Leaderboard -->
+        <div class="leaderboard-panel">
+          <h3 style="font-family:var(--font-title); font-size:1rem; color:#fff; display:flex; justify-content:space-between;">
+            <span><i class="fa-solid fa-trophy text-warning"></i> Live Klassement</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);" id="arena-leader-tag">P1: Mario</span>
+          </h3>
+          <div style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto;" id="arena-ranking-list">
+            <!-- Dynamic list of racers sorted by progress -->
           </div>
         </div>
 
-        <div class="sidebar-section scroll-section">
-          <h3>Bezochte Landen</h3>
-          <ul id="visited-countries-list" class="country-list">
-            <!-- Dynamically populated -->
-          </ul>
+      </div>
+
+    </section>
+
+    <!-- ==================== SCREEN 2B: STUDENT PLAYER CONTROLLER ==================== -->
+    <section id="player-race-screen" class="screen">
+      <div class="player-view-container">
+        
+        <!-- Status card -->
+        <div class="player-hero-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:2.2rem;" id="player-card-emoji">&#x1F344;</span>
+            <div>
+              <strong style="font-size:1.1rem; color:#fff;" id="player-card-name">Student Naam</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted);" id="player-card-character">Mario</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="player-rank-large" id="player-card-rank">P1</div>
+            <span style="font-size:0.75rem; color:var(--accent);" id="player-card-progress">25% van de baan</span>
+          </div>
         </div>
 
-        <div class="sidebar-footer">
-          <p class="instruction-tip">
-            <i class="fa-solid fa-circle-info"></i> Klik op een oplichtend land op de wereldkaart om de quiz te starten.
-          </p>
+        <!-- Player Item Button -->
+        <div class="player-item-trigger" id="player-item-btn">
+          <span style="font-size:2rem;" id="player-item-emoji">&#x2753;</span>
+          <span id="player-item-text">Geen Mario Kart Item (beantwoord snel goed!)</span>
         </div>
-      </aside>
 
-      <!-- Map Area -->
-      <main class="map-area glass">
-        <div id="map"></div>
-      </main>
-    </div>
+        <!-- Question View for Student -->
+        <div class="question-card-live" style="margin-top:4px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span style="font-size:0.8rem; font-weight:bold; color:var(--cyan);" id="player-q-country">Spanje</span>
+            <span style="font-family:var(--font-arcade); font-size:0.9rem; color:var(--gold);" id="player-timer-text">25s</span>
+          </div>
+
+          <div style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:14px;" id="player-q-prompt">
+            Vraag verschijnt hier...
+          </div>
+
+          <div class="options-live-grid" id="player-options-grid">
+            <!-- Big Tap Buttons A, B, C for Student -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 3: PODIUM FINISH ==================== -->
+    <section id="podium-screen" class="screen">
+      <div style="text-align:center; padding:30px 10px;">
+        <h1 style="font-family:var(--font-title); font-size:2.4rem; font-weight:900; background:linear-gradient(90deg, #ffa502, #ff4757, #2ed573); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:8px;">
+          &#x1F3C6; GRAND PRIX FINISH ! &#x1F3C1;
+        </h1>
+        <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:30px;">
+          Wat een geweldige strijd tussen de studenten op de internationale baan!
+        </p>
+
+        <!-- 3D Podium -->
+        <div style="display:flex; align-items:flex-end; justify-content:center; gap:20px; height:280px; margin-bottom:30px;">
+          
+          <!-- 2e Plaats -->
+          <div style="width:140px; height:160px; background:linear-gradient(180deg, #d2dae2, #808e9b); border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:16px; position:relative; box-shadow:0 8px 25px rgba(0,0,0,0.5);">
+            <div style="position:absolute; top:-65px; display:flex; flex-direction:column; align-items:center;">
+              <span style="font-size:2.8rem;" id="podium-2-emoji">&#x1F951;</span>
+              <strong style="font-size:0.85rem; color:#fff;" id="podium-2-name">Zilveren Racer</strong>
+            </div>
+            <span style="font-family:var(--font-arcade); font-size:2rem; color:rgba(0,0,0,0.7);">2</span>
+          </div>
+
+          <!-- 1e Plaats -->
+          <div style="width:150px; height:220px; background:linear-gradient(180deg, #ffa502, #e67e22); border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:16px; position:relative; box-shadow:0 12px 30px rgba(0,0,0,0.6); border:3px solid #ffdd59;">
+            <div style="position:absolute; top:-75px; display:flex; flex-direction:column; align-items:center;">
+              <span style="font-size:1.8rem;">&#x1F451;</span>
+              <span style="font-size:2.8rem;" id="podium-1-emoji">&#x1F344;</span>
+              <strong style="font-size:0.95rem; color:#fff;" id="podium-1-name">KAMPIOEN</strong>
+            </div>
+            <span style="font-family:var(--font-arcade); font-size:2.4rem; color:rgba(0,0,0,0.7);">1</span>
+          </div>
+
+          <!-- 3e Plaats -->
+          <div style="width:140px; height:120px; background:linear-gradient(180deg, #e17055, #d63031); border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:16px; position:relative; box-shadow:0 8px 25px rgba(0,0,0,0.5);">
+            <div style="position:absolute; top:-65px; display:flex; flex-direction:column; align-items:center;">
+              <span style="font-size:2.8rem;" id="podium-3-emoji">&#x1F422;</span>
+              <strong style="font-size:0.85rem; color:#fff;" id="podium-3-name">Bronzen Racer</strong>
+            </div>
+            <span style="font-family:var(--font-arcade); font-size:2rem; color:rgba(0,0,0,0.7);">3</span>
+          </div>
+
+        </div>
+
+        <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+          <button class="header-btn" style="background:#0056b3; color:#fff; padding:12px 20px;" id="podium-cert-btn">
+            <i class="fa-solid fa-award"></i> Toon Kampioenen Certificaat
+          </button>
+          <button class="header-btn" style="padding:12px 20px;" id="podium-rematch-btn">
+            <i class="fa-solid fa-rotate-right"></i> Nieuwe Grand Prix Starten
+          </button>
+        </div>
+      </div>
+    </section>
+
   </div>
 
-  <!-- ==================== QUIZ OVERLAY MODAL ==================== -->
-  <div id="quiz-modal" class="modal-overlay">
-    <div class="card glass modal-card">
-      <div class="modal-header">
-        <h2 id="modal-country-title">Spanje</h2>
-        <span class="badge-continent" id="modal-continent-title">Europa</span>
+  <!-- ==================== MODAL: ITEM & SPELREGELS GIDS ==================== -->
+  <div class="modal-backdrop" id="item-guide-modal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px; margin-bottom:14px;">
+        <h2 style="font-family:var(--font-title); font-size:1.4rem; color:var(--gold); display:flex; align-items:center; gap:10px;">
+          <i class="fa-solid fa-book-open"></i> Mario Kart Spelregels &amp; Item Gids
+        </h2>
+        <button class="header-btn" id="close-item-guide-btn"><i class="fa-solid fa-xmark"></i> Sluiten</button>
       </div>
 
-      <div class="modal-body">
-        <div class="quiz-progress">
-          Vraag <span id="current-question-num">1</span> van 5
-          <div class="progress-bar-outer mini-bar">
-            <div id="mini-progress-fill" style="width: 20%;"></div>
-          </div>
-        </div>
-
-        <h3 id="question-text" class="question-title">Hier komt de vraag te staan?</h3>
-
-        <div class="options-container" id="options-box">
-          <!-- Dynamically populated options -->
-        </div>
-
-        <div id="explanation-box" class="explanation-box hidden">
-          <h4><i class="fa-solid fa-circle-check"></i> Toelichting:</h4>
-          <p id="explanation-text">Hier komt de toelichting waarom het antwoord correct is.</p>
-          <button id="next-question-btn" class="btn primary-btn">Volgende Vraag</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== GAME OVER SCREEN ==================== -->
-  <div id="game-over-screen" class="screen">
-    <div class="card glass start-card result-card">
-      <div class="logo-container">
-        <img src="logo.png" alt="CIOS Zuidwest-NL Logo" class="cios-logo">
-      </div>
-      <h1 class="glow-text">Gefeliciteerd, Globetrotter!</h1>
-      <h2 class="sub-glow" id="result-name">Student</h2>
-      <p class="description">
-        Je hebt de 5 werelddelen succesvol bereisd en alle interculturele tests afgerond. Je bent nu officieel voorbereid op jouw buitenlandse stage!
+      <p style="font-size:0.88rem; color:#dcdde1; line-height:1.4; margin-bottom:14px;">
+        Bij elk goed en snel antwoord maken studenten kans op een officieel Mario Kart item in hun inventaris. Tik op het item op je telefoonscherm om het tactisch in te zetten!
       </p>
 
-      <div class="stats-grid">
-        <div class="stat-card glass">
-          <span class="stat-label">Totale Score</span>
-          <span class="stat-value" id="final-score">100</span>
+      <div class="item-guide-grid">
+        
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F344;</span>
+          <div class="item-guide-info">
+            <strong>Turbo Paddenstoel (Mushroom Boost)</strong>
+            <p>Geeft de kart direct <strong>+200 meter extra turbo sprint</strong> en schiet met vlammen vooruit op het circuit!</p>
+          </div>
         </div>
-        <div class="stat-card glass">
-          <span class="stat-label">Landen Bezocht</span>
-          <span class="stat-value" id="final-visited">5</span>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F34C;</span>
+          <div class="item-guide-info">
+            <strong>Bananenschil (Banana Hazard)</strong>
+            <p>Laat een directe concurrent slippen! Het slachtoffer maakt een <strong>360&deg; slip</strong> en verliest 100m voorsprong.</p>
+          </div>
         </div>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F422;</span>
+          <div class="item-guide-info">
+            <strong>Groen Schild (Green Shell)</strong>
+            <p>Wordt naar voren afgevuurd en schakelt de kart direct v&oacute;&oacute;r je uit voor een directe inhaalactie.</p>
+          </div>
+        </div>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F422;&#x1F499;</span>
+          <div class="item-guide-info">
+            <strong>Blauw Schild (Blue Shell Catch-Up)</strong>
+            <p>Exclusief voor studenten die achterin liggen (P7-P12)! Vliegt automatisch over de baan naar de <strong>nummer 1</strong> en remt de leider fors af.</p>
+          </div>
+        </div>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F31F;</span>
+          <div class="item-guide-info">
+            <strong>Ster (Star Power)</strong>
+            <p>Maakt de kart <strong>onkwetsbaar</strong> en geeft <strong>dubbele snelheid</strong> voor de komende 2 bochten!</p>
+          </div>
+        </div>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x1F6E0;&#xFE0F;</span>
+          <div class="item-guide-info">
+            <strong>Pitstop 50/50 Joker</strong>
+            <p>Hulplijn voor lastige vragen: streept direct 1 fout antwoord weg.</p>
+          </div>
+        </div>
+
+        <div class="item-guide-row">
+          <span class="item-guide-emoji">&#x23F1;&#xFE0F;</span>
+          <div class="item-guide-info">
+            <strong>Bandenwissel (+20 sec)</strong>
+            <p>Geeft 20 seconden extra rust en bedenktijd om met je duo te overleggen.</p>
+          </div>
+        </div>
+
       </div>
 
-      <div class="certificate-badge">
-        <i class="fa-solid fa-award"></i>
-        <span>CIOS IBPV Gecertificeerd</span>
-      </div>
-
-      <button id="restart-btn" class="btn primary-btn btn-glowing">
-        <i class="fa-solid fa-rotate-left"></i> Opnieuw Spelen
+      <button class="start-race-btn" id="guide-understood-btn" style="padding:12px;">
+        IK SNAP HET, TERUG NAAR DE RACE!
       </button>
     </div>
   </div>
 
-  <!-- Confetti Canvas Container -->
-  <div id="confetti-container"></div>
+  <!-- ==================== MODAL: FEEDBACK OVERLAY ==================== -->
+  <div class="modal-backdrop" id="feedback-modal">
+    <div class="modal-card" style="max-width:550px; text-align:center;">
+      <div style="font-size:3.5rem; margin-bottom:10px;" id="feedback-icon">&#x1F389;</div>
+      <h2 style="font-family:var(--font-title); font-size:1.6rem; font-weight:900; margin-bottom:10px;" id="feedback-title">
+        SUPER TURBO SPRINT!
+      </h2>
+      <div style="font-size:0.95rem; color:#d1d8e0; line-height:1.5; margin-bottom:20px; background:rgba(0,0,0,0.3); padding:14px; border-radius:10px; text-align:left;" id="feedback-text">
+        Toelichting komt hier te staan.
+      </div>
+      <button class="start-race-btn" id="feedback-next-btn" style="padding:12px;">
+        VOLGENDE BOCHT <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
 
-  <!-- Leaflet GIS Map JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <!-- App Files -->
-  <script src="questions.js"></script>
-  <script src="app.js"></script>
+  <!-- ==================== MODAL: QUESTIONS EDITOR ==================== -->
+  <div class="modal-backdrop" id="questions-editor-modal">
+    <div class="modal-card" style="max-width:950px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px; margin-bottom:16px;">
+        <h2 style="font-family:var(--font-title); font-size:1.3rem; color:var(--gold);">
+          <i class="fa-solid fa-pen-to-square"></i> Vragen &amp; Landen Beheer
+        </h2>
+        <button class="header-btn" id="editor-close-btn"><i class="fa-solid fa-xmark"></i> Sluiten</button>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+        <select id="editor-country-filter" class="form-select" style="max-width:220px;"></select>
+        <button class="header-btn" id="save-questions-btn" style="background:#2ed573; color:#000;">
+          <i class="fa-solid fa-floppy-disk"></i> Wijzigingen Opslaan
+        </button>
+        <button class="header-btn" id="export-questions-btn">
+          <i class="fa-solid fa-download"></i> Exporteer JSON
+        </button>
+        <button class="header-btn" id="import-questions-btn">
+          <i class="fa-solid fa-upload"></i> Importeer JSON
+        </button>
+        <input type="file" id="import-file-input" style="display:none;" accept=".json">
+        <button class="header-btn" id="reset-questions-btn" style="color:#ff6b81;">
+          <i class="fa-solid fa-trash-can"></i> Reset naar Standaard
+        </button>
+      </div>
+
+      <div id="editor-questions-list"></div>
+    </div>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+const QUESTIONS = {
+  nederland: {
+    title: "Nederland",
+    questions: [
+      {
+        question: "Hoe wordt feedback in de Nederlandse sportcultuur doorgaans gegeven?",
+        options: {
+          A: "Heel indirect, om de gevoelens van de sporter te sparen.",
+          B: "Direct en confronterend, gericht op de taak en taakverbetering.",
+          C: "Via de aanvoerder, rechtstreeks contact met de coach is zeldzaam."
+        },
+        correct: "B",
+        explanation: "Nederlanders zijn erg direct in hun communicatie. Dit kan in het buitenland soms als onbeleefd of bot worden ervaren."
+      },
+      {
+        question: "Wat typeert de omgang tussen een MBO-stagiair en een hoofdtrainer in Nederland?",
+        options: {
+          A: "Er is een strikte hiërarchie; je spreekt de trainer altijd met 'u' aan.",
+          B: "De hiërarchie is plat; je noemt de trainer vaak bij de voornaam en overlegt informeel.",
+          C: "Stagiaires mogen niet rechtstreeks met de hoofdtrainer praten."
+        },
+        correct: "B",
+        explanation: "Nederland heeft een lage machtsafstand. Informele omgang en tutoyeren zijn heel gebruikelijk."
+      },
+      {
+        question: "Wat is het 'poldermodel' in de context van een sportvereniging?",
+        options: {
+          A: "De club wordt volledig geleid door één dictatoriale voorzitter.",
+          B: "Er is veel overleg met commissies, trainers en ouders om consensus te bereiken.",
+          C: "Het trainen op drassige velden onder de zeespiegel."
+        },
+        correct: "B",
+        explanation: "Het poldermodel staat voor samenwerking en consensus. Besluiten worden genomen na overleg met alle betrokkenen."
+      },
+      {
+        question: "Hoe belangrijk is stiptheid (tijd) bij Nederlandse sportclubs?",
+        options: {
+          A: "Tijd is flexibel; 15 minuten te laat is geen enkel probleem.",
+          B: "Tijd is geld; als je 5 minuten te laat bent, start je op de reservebank.",
+          C: "Alleen de trainer hoeft op tijd te zijn."
+        },
+        correct: "B",
+        explanation: "Nederland heeft een monochrone tijdsbeleving. Afspraak is afspraak en op tijd komen is de norm."
+      },
+      {
+        question: "Welke waarde staat centraal bij jeugdsport in Nederland?",
+        options: {
+          A: "Winnen ten koste van alles.",
+          B: "Plezier, brede motorische ontwikkeling en gelijke kansen voor elk kind.",
+          C: "Strikte militaire discipline vanaf 6 jaar."
+        },
+        correct: "B",
+        explanation: "In Nederland ligt de focus bij jeugdsport sterk op breedtemotorische ontwikkeling, plezier en participatie."
+      }
+    ]
+  },
+  spanje: {
+    title: "Spanje",
+    questions: [
+      {
+        question: "Je wilt om 14:00 uur een buitensportactiviteit plannen voor jongeren in Spanje. Waarom is dit geen goed idee?",
+        options: {
+          A: "Het is dan te donker in Spanje.",
+          B: "Het is de tijd van de siësta; winkels zijn dicht en het is te heet om te sporten.",
+          C: "Spaanse jongeren sporten alleen in de vroege ochtend."
+        },
+        correct: "B",
+        explanation: "Tussen 14:00 en 17:00 uur ligt het openbare leven in Spanje grotendeels stil vanwege de warmte en de siësta."
+      },
+      {
+        question: "Hoe verschilt de Spaanse feedbackmethode van de Nederlandse directheid?",
+        options: {
+          A: "Spanjaarden zijn nóg directer en harder in hun feedback.",
+          B: "Spanjaarden geven feedback subtieler en vaak een-op-een om gezichtsverlies te voorkomen.",
+          C: "Feedback wordt in Spanje altijd schriftelijk gegeven."
+        },
+        correct: "B",
+        explanation: "Spanje heeft een meer indirecte communicatiecultuur waarin persoonlijke relaties en respect erg belangrijk zijn."
+      },
+      {
+        question: "Wat is cruciaal voordat je met een Spaanse sportorganisatie zaken gaat doen of afspraken maakt?",
+        options: {
+          A: "Direct het contract op tafel leggen.",
+          B: "Tijd nemen voor een praatje, koffie drinken en een persoonlijke relatie opbouwen.",
+          C: "Formeel buigen en cadeaus uitwisselen."
+        },
+        correct: "B",
+        explanation: "De Spaanse cultuur is relatiegericht (relation-oriented). Vertrouwen en persoonlijk contact gaan voor de inhoud van de afspraak."
+      },
+      {
+        question: "Hoe laat beginnen avondtrainingen voor volwassenen in Spanje doorgaans?",
+        options: {
+          A: "Om 17:00 uur direct na school/werk.",
+          B: "Veel later dan in Nederland, vaak pas tussen 20:00 en 22:00 uur.",
+          C: "Altijd exact om 19:00 uur."
+        },
+        correct: "B",
+        explanation: "Vanwege het warmere klimaat en de siësta schuift de avond in Spanje op. Het avondeten en sporttrainingen vinden veel later plaats."
+      },
+      {
+        question: "Hoe begroeten mannelijke en vrouwelijke collega's elkaar op een Spaanse sportclub?",
+        options: {
+          A: "Met een formele buiging zonder fysiek contact.",
+          B: "Vrouwen geven elkaar en mannen vaak twee kussen op de wangen; mannen geven elkaar een hand of omhelzing.",
+          C: "Fysiek contact is strikt verboden."
+        },
+        correct: "B",
+        explanation: "De Spaanse cultuur is warmer en fysieker in begroetingen dan de Nederlandse afstandelijke handdruk."
+      }
+    ]
+  },
+  duitsland: {
+    title: "Duitsland",
+    questions: [
+      {
+        question: "Wat betekent 'pünktlich' zijn bij een Duitse sportvereniging?",
+        options: {
+          A: "Binnenkomen rond de afgesproken tijd (5 tot 10 minuten speling).",
+          B: "Minimaal 5 tot 10 minuten vóór de afgesproken tijd speelklaar aanwezig zijn.",
+          C: "Als de training om 19:00 uur begint, vertrek je om 19:00 uur van huis."
+        },
+        correct: "B",
+        explanation: "In Duitsland is punctualiteit een teken van respect. Te laat komen wordt als zeer onprofessioneel gezien."
+      },
+      {
+        question: "Hoe spreek je de hoofdtrainer van een Duitse club aan als stagiair?",
+        options: {
+          A: "Direct bij zijn voornaam, net als in Nederland.",
+          B: "Met 'Herr' of 'Frau' gevolgd door de achternaam en de beleefdheidsvorm 'Sie'.",
+          C: "Met de titel 'Chef' of 'Meister'."
+        },
+        correct: "B",
+        explanation: "Duitsland heeft een hogere machtsafstand en formelere omgangsvormen. Je gebruikt 'Sie' (u) totdat men expliciet aanbiedt te tutoyeren."
+      },
+      {
+        question: "Wat typeert de Duitse werk- en sportcultuur als het gaat om regels?",
+        options: {
+          A: "Regels zijn er om flexibel mee om te gaan.",
+          B: "Er is een sterke voorkeur voor structuur, duidelijke protocollen en het strikt naleven van regels.",
+          C: "Er zijn vrijwel geen regels, alles wordt ter plekke bedacht."
+        },
+        correct: "B",
+        explanation: "Duitsland scoort hoog op onzekerheidsvermijding. Duidelijke afspraken, wetten en regels geven houvast en structuur."
+      },
+      {
+        question: "Hoe scheid je werk/stage en privéleven in Duitsland?",
+        options: {
+          A: "Je nodigt je Duitse collega's direct in de eerste week uit voor een barbecue thuis.",
+          B: "Er is een duidelijke scheidslijn; collegiaal op de club, maar privézaken worden zelden direct gedeeld.",
+          C: "Je bespreekt al je relatieproblemen tijdens de eerste warming-up."
+        },
+        correct: "B",
+        explanation: "Duitsers houden werk en privé over het algemeen strikt gescheiden. Vriendschappen op de werkvloer groeien langzamer."
+      },
+      {
+        question: "Als Duitse sporters kritiek krijgen van de coach, hoe reageren zij dan?",
+        options: {
+          A: "Ze gaan direct in discussie over de tactiek (polderen).",
+          B: "Ze accepteren de feedback van de expert (de coach) gedisciplineerd en gaan aan het werk.",
+          C: "Ze weigeren verder te trainen."
+        },
+        correct: "B",
+        explanation: "In Duitsland wordt de expertise van de coach gerespecteerd. Feedback wordt professioneel en taakgericht geaccepteerd."
+      }
+    ]
+  },
+  frankrijk: {
+    title: "Frankrijk",
+    questions: [
+      {
+        question: "Hoe spreek je een Franse sportdocent of coach aan tijdens je stage?",
+        options: {
+          A: "Met 'tu' (jij) en zijn voornaam.",
+          B: "Met 'Monsieur' of 'Madame' en je gebruikt de beleefdheidsvorm 'vous' (u).",
+          C: "Je zwaait en roept 'Salut!'"
+        },
+        correct: "B",
+        explanation: "In Frankrijk is de hiërarchie op scholen en sportclubs formeler. De 'vous'-vorm is de standaard voor stagiaires."
+      },
+      {
+        question: "Je spreekt geen vloeiend Frans. Wat is de beste houding tijdens je stage in Frankrijk?",
+        options: {
+          A: "Direct in het Engels beginnen en verwachten dat iedereen Engels spreekt.",
+          B: "Altijd beginnen met een poging in het Frans (groeten en excuseren), waarna men vaak graag overschakelt naar Engels.",
+          C: "Helemaal niets zeggen en alles non-verbaal uitbeelden."
+        },
+        correct: "B",
+        explanation: "Fransen zijn trots op hun taal. Een oprechte poging om Frans te spreken opent deuren en dwingt respect af."
+      },
+      {
+        question: "Hoe wordt de rol van de sportcoach in Frankrijk gezien?",
+        options: {
+          A: "Als een gelijke die gezellig meedoet met de groep.",
+          B: "Als een autoriteit (directeur de jeu) wiens beslissingen niet openlijk in twijfel worden getrokken.",
+          C: "Als een vrijwilliger die weinig te vertellen heeft."
+        },
+        correct: "B",
+        explanation: "Frankrijk heeft een hogere machtsafstand. De coach heeft de leiding en er is duidelijk respect voor deze positie."
+      },
+      {
+        question: "Wat is 'la bise' in de Franse sportcontext?",
+        options: {
+          A: "Een tactische voetbalopstelling.",
+          B: "De informele begroeting met wangkussen tussen bekende collega's of teamgenoten.",
+          C: "Een strafopdracht na te laat komen."
+        },
+        correct: "B",
+        explanation: "'La bise' is het kussen op de wangen (meestal 2, soms 3 of 4 afhankelijk van de regio) als begroeting tussen bekenden."
+      },
+      {
+        question: "Hoe strak verloopt de planning van een sportevenement in Frankrijk?",
+        options: {
+          A: "Extreem flexibel; men start als iedereen er is.",
+          B: "Er is een strak draaiboek, maar besluitvorming bij wijzigingen verloopt top-down via de leidinggevende.",
+          C: "Iedereen mag zelf beslissen hoe het evenement verloopt."
+        },
+        correct: "B",
+        explanation: "Besluitvorming is in Frankrijk gecentraliseerd. Zelfs bij een strakke planning beslist de baas over de wijzigingen."
+      }
+    ]
+  },
+  italie: {
+    title: "Italië",
+    questions: [
+      {
+        question: "Wat valt op aan de communicatiestijl van een Italiaanse sportcoach?",
+        options: {
+          A: "Zeer gereserveerd en monotoon.",
+          B: "Expressief, met veel handgebaren, stemverheffing en emotie.",
+          C: "Zij spreken uitsluitend via geschreven instructies."
+        },
+        correct: "B",
+        explanation: "Italianen communiceren met veel passie en non-verbale ondersteuning (gebaren). Dit is een teken van betrokkenheid, niet van woede."
+      },
+      {
+        question: "Welke sport heeft een bijna religieuze status in de Italiaanse cultuur?",
+        options: {
+          A: "Honkbal.",
+          B: "Voetbal (Il Calcio).",
+          C: "Veldhockey."
+        },
+        correct: "B",
+        explanation: "Voetbal is veruit de populairste sport in Italië en speelt een enorme rol in de nationale identiteit en media."
+      },
+      {
+        question: "Hoe belangrijk is uiterlijke presentatie ('Bella Figura') op een Italiaanse sportclub?",
+        options: {
+          A: "Totaal onbelangrijk; je mag in je pyjama training geven.",
+          B: "Heel belangrijk; representatieve, schone clubkleding en een verzorgd uiterlijk dwingen respect af.",
+          C: "Alleen belangrijk voor de sporters, niet voor de coach."
+        },
+        correct: "B",
+        explanation: "'Fare bella figura' betekent een goede indruk maken. Kleding, uitstraling en gedrag moeten verzorgd en professioneel zijn."
+      },
+      {
+        question: "Wat is de Italiaanse houding ten opzichte van kloktijd bij trainingen?",
+        options: {
+          A: "Militair stipt; te laat is direct naar huis.",
+          B: "Relatief flexibel; een paar minuten marge is normaal, zolang de passie en inzet er maar zijn.",
+          C: "Trainingen beginnen wanneer het de sporters uitkomt."
+        },
+        correct: "B",
+        explanation: "Italië heeft een meer polychrone tijdsbeleving dan Nederland. Relaties en het moment zijn belangrijker dan de exacte minuut."
+      },
+      {
+        question: "Hoe bouw je als Nederlandse stagiair krediet op bij een Italiaanse club?",
+        options: {
+          A: "Door direct kritiek te leveren op de cluborganisatie.",
+          B: "Door respect te tonen voor de clubgeschiedenis en interesse te tonen in de Italiaanse keuken en cultuur.",
+          C: "Door alleen maar Engels te praten."
+        },
+        correct: "B",
+        explanation: "Persoonlijke relaties en respect voor de lokale tradities zijn in Italië de sleutel tot een succesvolle samenwerking."
+      }
+    ]
+  },
+  verenigd_koninkrijk: {
+    title: "Verenigd Koninkrijk",
+    questions: [
+      {
+        question: "Wat betekent het als een Britse sportcoach zegt: 'I would suggest you try this option'?",
+        options: {
+          A: "Het is een vrijblijvende tip; je mag zelf kiezen wat je doet.",
+          B: "Het is een beleefde instructie; je wordt geacht dit direct te gaan doen.",
+          C: "Hij weet het zelf ook niet en vraagt jou om hulp."
+        },
+        correct: "B",
+        explanation: "Britten communiceren erg indirect en beleefd. Een 'suggestie' is in de praktijk vaak een vriendelijk verpakt commando."
+      },
+      {
+        question: "Welk concept staat historisch aan de basis van de Britse sportethiek?",
+        options: {
+          A: "Winnen ten koste van alles.",
+          B: "Fair Play en sportiviteit (gentlemanly conduct).",
+          C: "Strikte tactische systemen zonder individuele vrijheid."
+        },
+        correct: "B",
+        explanation: "Het concept van 'Fair Play' is diep geworteld in de Britse sportgeschiedenis (oorspronkelijk uit de public schools)."
+      },
+      {
+        question: "Wat is de Britse traditie na afloop van een sportwedstrijd op clubniveau?",
+        options: {
+          A: "Iedereen gaat direct zonder te douchen naar huis.",
+          B: "Samen met de tegenstander een drankje doen in het clubhuis ('the pub' / bar) en napraten.",
+          C: "De verliezers moeten de kleedkamer van de winnaars schoonmaken."
+        },
+        correct: "B",
+        explanation: "Socialiseren na de wedstrijd (socializing in the clubhouse) is een essentieel onderdeel van de Britse sportcultuur."
+      },
+      {
+        question: "Hoe reageert een Britse sporter als hij/zij pijn heeft tijdens een training?",
+        options: {
+          A: "Met luid geschreeuw en klagen.",
+          B: "Met de 'stiff upper lip': niet zeuren, verbijten en doorgaan.",
+          C: "Direct stoppen en een schadeclaim indienen."
+        },
+        correct: "B",
+        explanation: "De 'stiff upper lip' staat voor het niet tonen van emoties of pijn onder moeilijke omstandigheden."
+      },
+      {
+        question: "Hoe is de hiërarchie binnen Britse sportverenigingen geregeld?",
+        options: {
+          A: "Er is geen bestuur; iedereen beslist mee.",
+          B: "Formeel en traditioneel; er zijn duidelijke rollen (Chairman, Secretary) en protocollen.",
+          C: "Alleen de trainer beslist alles."
+        },
+        correct: "B",
+        explanation: "Britse clubs hebben vaak een traditionele en formele organisatiestructuur met veel respect voor rollen en commissies."
+      }
+    ]
+  },
+  aruba: {
+    title: "Aruba",
+    questions: [
+      {
+        question: "Welke talen spreekt men op Aruba en hoe beïnvloedt dit je sportstage?",
+        options: {
+          A: "Uitsluitend Nederlands.",
+          B: "Papiamento is de thuistaal, maar de meeste mensen spreken ook vloeiend Nederlands, Engels en Spaans.",
+          C: "Alleen Spaans en Engels."
+        },
+        correct: "B",
+        explanation: "Arubanen zijn meertalig. Dit maakt communicatie makkelijk, maar respect tonen door een paar woorden Papiamento te spreken wordt zeer gewaardeerd."
+      },
+      {
+        question: "Welke sport heeft een extreem hoge status en levert veel Arubaanse topsporters op?",
+        options: {
+          A: "Schaatsen.",
+          B: "Honkbal (Baseball).",
+          C: "Veldhockey."
+        },
+        correct: "B",
+        explanation: "Honkbal is de nationale sport op Aruba. Veel Arubanen spelen in de Amerikaanse Major League of het Koninkrijksteam."
+      },
+      {
+        question: "Hoe ga je om met de 'eiland-tijd' (island time) op Aruba?",
+        options: {
+          A: "Je wordt boos als sporters 10 minuten te laat komen.",
+          B: "Je houdt zelf strak de tijd aan, maar toont flexibiliteit en begrip als deelnemers iets later zijn door hitte of transport.",
+          C: "Je komt zelf ook structureel een half uur te laat."
+        },
+        correct: "B",
+        explanation: "Het tempo op de eilanden ligt vaak lager. Geduld en flexibiliteit zijn belangrijk, zonder je eigen professionaliteit te verliezen."
+      },
+      {
+        question: "Wat typeert de Arubaanse houding ten opzichte van familie en ouderen?",
+        options: {
+          A: "Familie speelt een kleine rol; ouderen wonen apart.",
+          B: "Familie is centraal en ouderen genieten veel respect; dit zie je terug in beleefde omgangsvormen.",
+          C: "Kinderen beslissen alles binnen het gezin."
+        },
+        correct: "B",
+        explanation: "Aruba heeft een collectivistische cultuur waarin familiebanden en respect voor senioren erg belangrijk zijn."
+      },
+      {
+        question: "Vanwege het warme klimaat op Aruba: wanneer plannen sportclubs hun buitenactiviteiten?",
+        options: {
+          A: "Tussen 12:00 en 14:00 uur.",
+          B: "In de vroege ochtend of de koelere namiddag/avond (vaak onder kunstlicht).",
+          C: "Uitsluitend in overdekte airco-hallen."
+        },
+        correct: "B",
+        explanation: "Om oververhitting te voorkomen, vinden sporttrainingen buiten het heetste deel van de dag plaats."
+      }
+    ]
+  },
+  bonaire: {
+    title: "Bonaire",
+    questions: [
+      {
+        question: "Bonaire staat wereldwijd bekend om een specifieke sporttak. Welke is dit?",
+        options: {
+          A: "Alpineskiën.",
+          B: "Duiken en wind-/kitesurfen (watersporten).",
+          C: "IJshockey."
+        },
+        correct: "B",
+        explanation: "Bonaire is een paradijs voor duikers en windsurfers (Lac Bay) vanwege de constante passaatwinden en beschermde koraalriffen."
+      },
+      {
+        question: "Wat is de status van natuurbescherming op Bonaire en wat betekent dit voor sportcoaches?",
+        options: {
+          A: "Natuur is ondergeschikt aan sport; je mag overal sporten.",
+          B: "Zeer streng; de STINAPA-regels beschermen het mariene park en studenten moeten milieubewust handelen.",
+          C: "Alleen toeristen moeten zich aan milieuregels houden."
+        },
+        correct: "B",
+        explanation: "Bonaire hecht veel waarde aan natuurbehoud. Als sportcoach in de watersport moet je de STINAPA-richtlijnen strikt volgen."
+      },
+      {
+        question: "Hoe begroet je mensen op Bonaire als je ze tegenkomt op straat of op de sportclub?",
+        options: {
+          A: "Negeren en snel doorlopen.",
+          B: "Altijd vriendelijk groeten met 'Bon dia' (goedemorgen) of 'Bon tardi' (goedemiddag).",
+          C: "Met een formele militaire groet."
+        },
+        correct: "B",
+        explanation: "Beleefdheid en elkaar groeten is een belangrijk onderdeel van de Bonairiaanse cultuur en gemeenschap."
+      },
+      {
+        question: "Wat is het voordeel van de kleinschaligheid van Bonaire voor jouw BPV-stage?",
+        options: {
+          A: "Je hoeft geen POK te regelen.",
+          B: "Iedereen kent elkaar; netwerken en korte lijnen met scholen en sportorganisaties zijn makkelijk te leggen.",
+          C: "Er zijn geen regels op het eiland."
+        },
+        correct: "B",
+        explanation: "De gemeenschap is hecht. Een goede reputatie en vriendelijkheid zorgen snel voor ingangen bij verschillende organisaties."
+      },
+      {
+        question: "Wat betekent het woord 'Trankilo' op Bonaire?",
+        options: {
+          A: "Snel doorwerken.",
+          B: "Rustig aan, geen stress. Het typeert de relaxte levensstijl op het eiland.",
+          C: "Een type sportdrank."
+        },
+        correct: "B",
+        explanation: "'Trankilo' staat voor rust, kalmte en genieten. Het is belangrijk om je aan dit tempo aan te passen zonder laks te worden."
+      }
+    ]
+  },
+  curacao: {
+    title: "Curaçao",
+    questions: [
+      {
+        question: "Wat betekent het woord 'Dushi' in de Curaçaose cultuur?",
+        options: {
+          A: "Een scheldwoord voor een luie sporter.",
+          B: "Schatje, lekker, fijn of lief. Het wordt gebruikt voor eten, mensen en situaties.",
+          C: "De naam van een traditionele honkbalknuppel."
+        },
+        correct: "B",
+        explanation: "'Dushi' is het meest veelzijdige en positieve woord in het Papiamento en weerspiegelt de warme cultuur."
+      },
+      {
+        question: "Hoe uit non-verbale communicatie zich op Curaçao tijdens sportlessen?",
+        options: {
+          A: "Mensen zijn erg stijf en tonen geen emoties.",
+          B: "Zeer expressief; handgebaren, gezichtsuitdrukkingen en stemvolume horen bij de natuurlijke manier van praten.",
+          C: "Fysiek contact is taboe."
+        },
+        correct: "B",
+        explanation: "Curaçaoënaars communiceren met veel lichaamstaal en expressie. Dit is een teken van betrokkenheid en passie."
+      },
+      {
+        question: "Hoe reageer je als een sporter op Curaçao de term 'Awor af' (straks/nu) gebruikt?",
+        options: {
+          A: "Je verwacht dat het binnen 1 seconde gebeurt.",
+          B: "Je begrijpt dat 'awor' (nu) of 'aworikí' (zo meteen) flexibele begrippen zijn en toont geduld.",
+          C: "Je stelt direct een sanctie in."
+        },
+        correct: "B",
+        explanation: "Tijdsbeleving is op Curaçao polychroon. Relaties en het huidige moment gaan vaak voor de exacte kloktijd."
+      },
+      {
+        question: "Waarom is honkbal (baseball) zo succesvol op Curaçao?",
+        options: {
+          A: "Omdat er geen andere sporten worden gespeeld.",
+          B: "Door uitstekende talentontwikkeling, fysieke aanleg en rolmodellen in de Major League Baseball (MLB).",
+          C: "Honkbal is verplicht op alle scholen."
+        },
+        correct: "B",
+        explanation: "Curaçao levert per hoofd van de bevolking de meeste MLB-spelers ter wereld dankzij een sterke honkbalinfrastructuur."
+      },
+      {
+        question: "Wat is een belangrijk cultureel aspect bij het aanspreken van ouderen of docenten op Curaçao?",
+        options: {
+          A: "Je mag ze direct tutoyeren en grappen maken.",
+          B: "Je toont respect door beleefd te praten en hen met 'meneer' (Señor) of 'mevrouw' (Señora) aan te spreken.",
+          C: "Je mag hen niet aankijken tijdens het praten."
+        },
+        correct: "B",
+        explanation: "Respect voor autoriteit en ouderen is diep geworteld in de Curaçaose samenleving (hoge machtsafstand)."
+      }
+    ]
+  },
+  brazilie: {
+    title: "Brazilië",
+    questions: [
+      {
+        question: "Welk handgebaar dat in Nederland 'OK' of 'perfect' betekent, is in Brazilië een zware belediging?",
+        options: {
+          A: "Een duim omhoog.",
+          B: "Een cirkel maken met duim en wijsvinger.",
+          C: "Een v-teken met de wijs- en middelvinger."
+        },
+        correct: "B",
+        explanation: "Het maken van een cirkel met duim en wijsvinger duidt in Brazilië een lichaamsopening aan en is zeer obsceen."
+      },
+      {
+        question: "Wat typeert de groepsdynamiek en teamcohesie in de Braziliaanse sportcultuur?",
+        options: {
+          A: "Spelers zijn erg individualistisch en praten weinig.",
+          B: "Sterk collectivistisch; het team voelt als een familie en er is veel fysiek contact (knuffels, schouderklopjes).",
+          C: "Er is een strikte scheiding tussen verschillende spelersniveaus."
+        },
+        correct: "B",
+        explanation: "Brazilië heeft een collectivistische cultuur. Teamgeest, emotie en hechte onderlinge relaties zijn essentieel voor prestaties."
+      },
+      {
+        question: "Wat is de Braziliaanse 'Jeitinho' op het sportveld?",
+        options: {
+          A: "Een speciale dribbeltechniek bij voetbal.",
+          B: "De creatieve, informele manier om onder regels of problemen uit te komen en een oplossing te vinden.",
+          C: "Het zingen van het volkslied voor de wedstrijd."
+        },
+        correct: "B",
+        explanation: "'O jeitinho brasileiro' is de kunst om creatief en flexibel met regels en obstakels om te gaan om toch je doel te bereiken."
+      },
+      {
+        question: "Hoe ga je als Nederlandse sportcoach om met tijd en afspraken in Brazilië?",
+        options: {
+          A: "Je start stipt op de minuut en straft iedereen die 5 minuten te laat is.",
+          B: "Je houdt zelf de structuur aan, maar toont begrip; flexibiliteit met tijd is de norm (10-15 minuten marge).",
+          C: "Je laat de trainingstijden volledig los."
+        },
+        correct: "B",
+        explanation: "Tijd is elastisch in Brazilië. Relaties en het moment zijn belangrijker dan een rigide tijdsplanning."
+      },
+      {
+        question: "Welke sportvorm, ontstaan op de stranden van Rio, combineert volleybal en voetbal?",
+        options: {
+          A: "Futsal.",
+          B: "Futevôlei (Footvolley).",
+          C: "Capoeira."
+        },
+        correct: "B",
+        explanation: "Futevôlei is enorm populair in Brazilië. Het vereist een fantastische baltechniek omdat de bal niet met de handen aangeraakt mag worden."
+      }
+    ]
+  },
+  suriname: {
+    title: "Suriname",
+    questions: [
+      {
+        question: "Hoe toon je als jongere respect in de Surinaamse cultuur bij het praten met ouderen of je stagebegeleider?",
+        options: {
+          A: "Door hen intensief in de ogen te blijven aankijken.",
+          B: "Door een bescheiden houding aan te nemen en hen netjes aan te spreken met 'u', 'tante' of 'oom' (respecttitels).",
+          C: "Door direct een grap te maken om het ijs te breken."
+        },
+        correct: "B",
+        explanation: "Suriname heeft een respectcultuur met een hoge machtsafstand. Ouderen en leidinggevenden worden met veel egards behandeld."
+      },
+      {
+        question: "Welke sport heeft historisch gezien de sterkste band tussen Suriname en Nederland?",
+        options: {
+          A: "Schaatsen.",
+          B: "Voetbal (veel Nederlandse topvoetballers hebben Surinaamse roots).",
+          C: "Korfbal."
+        },
+        correct: "B",
+        explanation: "Suriname en Nederland delen een rijke voetbalgeschiedenis. Talloze topspelers in Oranje hebben een Surinaamse achtergrond."
+      },
+      {
+        question: "Wat is een belangrijk kenmerk van de communicatiestijl in Suriname?",
+        options: {
+          A: "Men is extreem direct en bot, net als in Nederland.",
+          B: "Men communiceert indirecter en hecht veel waarde aan beleefdheid en het behouden van de goede sfeer.",
+          C: "Men praat uitsluitend in gebarentaal."
+        },
+        correct: "B",
+        explanation: "Surinamers zijn over het algemeen zeer gastvrij en beleefd. Directe confrontaties of harde kritiek worden vermeden."
+      },
+      {
+        question: "Wat is 'Sranantongo' in de sportcontext in Suriname?",
+        options: {
+          A: "Een traditioneel Surinaams sportgerecht.",
+          B: "De Surinaamse taal die op het sportveld vaak informeel naast het Nederlands wordt gesproken.",
+          C: "Een speciale warming-up oefening."
+        },
+        correct: "B",
+        explanation: "Hoewel Nederlands de officiële taal is, spreken mensen onderling vaak Sranantongo. Enkele sporttermen kennen hierin hun eigen dynamiek."
+      },
+      {
+        question: "Hoe ga je om met trainingstijden tijdens het regenseizoen in Suriname?",
+        options: {
+          A: "Je dwingt de groep om tijdens een tropische regenbui (sibibusi) buiten te trainen.",
+          B: "Je past de training flexibel aan of verhuist naar binnen; tropische buien kunnen sportvelden snel onbegaanbaar maken.",
+          C: "Je gelooft niet dat het gaat regenen."
+        },
+        correct: "B",
+        explanation: "Het weer en de infrastructuur vragen om aanpassingsvermogen. Tropische buien kunnen trainingen tijdelijk stilleggen."
+      }
+    ]
+  },
+  colombia: {
+    title: "Colombia",
+    questions: [
+      {
+        question: "Hoe spreken sporters hun trainer of coach respectvol aan in Colombia?",
+        options: {
+          A: "Bij zijn voornaam.",
+          B: "Met de eretitel 'Profe' (kort voor Profesor).",
+          C: "Met 'Hey amigo!'"
+        },
+        correct: "B",
+        explanation: "In Colombia is 'Profe' de standaard respectvolle aanspreekvorm voor sportleraren en trainers op elk niveau."
+      },
+      {
+        question: "Naast voetbal is er nog een sport razend populair in Colombia, mede door de bergen. Welke is dit?",
+        options: {
+          A: "Wielrennen (Ciclismo).",
+          B: "Langebaanschaatsen.",
+          C: "Veldhockey."
+        },
+        correct: "B",
+        explanation: "Colombia heeft een rijke wielergeschiedenis en levert wereldtop klimmers (de 'escarabajos') dankzij het Andesgebergte."
+      },
+      {
+        question: "Hoe verloopt de begroeting tussen mannen en vrouwen op een Colombiaanse sportclub?",
+        options: {
+          A: "Met een strakke handdruk en 1.5 meter afstand.",
+          B: "Vrouwen en mannen begroeten elkaar vaak met één kus op de rechterwang en een lichte aanraking van de schouder.",
+          C: "Er wordt niet gegroet om tijd te besparen."
+        },
+        correct: "B",
+        explanation: "De Colombiaanse cultuur is fysiek en warm. Begroetingen bevatten vaak aanraking en een enkele kus op de rechterwang."
+      },
+      {
+        question: "Wat is 'Tejo' in Colombia?",
+        options: {
+          A: "Een traditionele Colombiaanse sport waarbij je met metalen schijven naar explosief buskruit gooit.",
+          B: "Een tactisch verdedigingssysteem bij voetbal.",
+          C: "De naam van de Colombiaanse sportbond."
+        },
+        correct: "A",
+        explanation: "Tejo is de nationale inheemse sport van Colombia. Het doel is om een metalen schijf (tejo) in een lemen bak te werpen en buskruit-pakketjes (mechas) te laten ontploffen."
+      },
+      {
+        question: "Hoe reageer je als Colombiaanse deelnemers te laat komen voor een wijkactiviteit?",
+        options: {
+          A: "Je annuleert direct de hele activiteit.",
+          B: "Je toont flexibiliteit; de 'Hora Colombiana' betekent dat activiteiten vaak 15-30 minuten later starten dan gepland.",
+          C: "Je geeft hen een fysieke strafopdracht."
+        },
+        correct: "B",
+        explanation: "Tijd is minder rigide in Colombia. Flexibiliteit en geduld zijn noodzakelijk om een goede relatie met de buurt te behouden."
+      }
+    ]
+  },
+  kenia: {
+    title: "Kenia",
+    questions: [
+      {
+        question: "Wat is de betekenis van de Keniaanse filosofie 'Harambee' op het sportveld?",
+        options: {
+          A: "Winnen is het allerbelangrijkste.",
+          B: "Samenwerking en gemeenschapszin; 'laten we met z'n allen de schouders eronder zetten'.",
+          C: "Een traditioneel hardloopschema."
+        },
+        correct: "B",
+        explanation: "'Harambee' is het nationale motto van Kenia en staat voor collectivisme en samen de klus klaren."
+      },
+      {
+        question: "In welke sportdiscipline is Kenia al decennia lang een wereldwijde grootmacht?",
+        options: {
+          A: "Lange- en middellangeafstandslopen (atletiek).",
+          B: "IJshockey.",
+          C: "Schoonspringen."
+        },
+        correct: "A",
+        explanation: "Kenia (met name de regio Iten/Eldoret) is wereldberoemd om haar hardlopers die de Olympische Spelen en marathons domineren."
+      },
+      {
+        question: "Hoe begroet je een Keniaanse oudere of sportbegeleider respectvol?",
+        options: {
+          A: "Met een snelle boks of high-five.",
+          B: "Met een stevige handdruk, waarbij je met je linkerhand je eigen rechteronderarm ondersteunt als teken van respect.",
+          C: "Met een buiging zonder oogcontact."
+        },
+        correct: "B",
+        explanation: "Het ondersteunen van de rechterarm tijdens de handdruk is een traditioneel teken van diep respect voor ouderen en autoriteiten."
+      },
+      {
+        question: "Wat betekent de uitdrukking 'Pole Pole' in de Keniaanse cultuur?",
+        options: {
+          A: "Ren zo snel als je kunt.",
+          B: "Rustig aan, stap voor stap. Tijd is flexibel.",
+          C: "De paal van het doel."
+        },
+        correct: "B",
+        explanation: "'Pole pole' is Swahili voor 'rustig aan'. Het weerspiegelt de ontspannen houding ten opzichte van tijd in Kenia."
+      },
+      {
+        question: "Waarom is sportmateriaal (zoals ballen en pionnen) een extra grote verantwoordelijkheid in Kenia?",
+        options: {
+          A: "Omdat materialen vaak schaars en duur zijn; zorgvuldig beheer en creatief improviseren is noodzakelijk.",
+          B: "Omdat de Keniaanse douane ballen verbiedt.",
+          C: "Omdat materialen snel smelten in de zon."
+        },
+        correct: "A",
+        explanation: "In veel Keniaanse wijkprojecten is er een tekort aan ballen en pionnen. Als coach leer je improviseren met lokale materialen."
+      }
+    ]
+  },
+  zuid_afrika: {
+    title: "Zuid-Afrika",
+    questions: [
+      {
+        question: "Wat is de betekenis van de Zuid-Afrikaanse filosofie 'Ubuntu'?",
+        options: {
+          A: "Een tactisch spelsysteem.",
+          B: "Medemenselijkheid en verbondenheid: 'Ik ben omdat wij zijn'.",
+          C: "De naam van een traditionele dans."
+        },
+        correct: "B",
+        explanation: "Ubuntu is de essentie van menselijkheid en benadrukt dat we alleen via anderen onszelf kunnen zijn. Dit stimuleert extreme teamcohesie."
+      },
+      {
+        question: "Welk historisch sportmoment bracht Zuid-Afrika na de Apartheid samen?",
+        options: {
+          A: "De winst van het WK Rugby in 1995 onder leiding van Nelson Mandela.",
+          B: "De Olympische marathon van 2012.",
+          C: "Een vriendschappelijke cricketwedstrijd."
+        },
+        correct: "A",
+        explanation: "Mandela gebruikte het WK Rugby 1995 (en de Springboks) om het verdeelde land te verenigen achter één gemeenschappelijk symbool."
+      },
+      {
+        question: "Hoeveel officiële talen heeft Zuid-Afrika en hoe beïnvloedt dit de coaching?",
+        options: {
+          A: "Alleen Engels.",
+          B: "11 officiële talen; je moet flexibel zijn en vaak non-verbale signalen of Engels als basistaal gebruiken.",
+          C: "Uitsluitend Afrikaans."
+        },
+        correct: "B",
+        explanation: "Zuid-Afrika is de 'Rainbow Nation' met 11 officiële talen. Engels wordt op sportclubs het meest als voertaal gebruikt."
+      },
+      {
+        question: "Hoe toon je respect naar autoriteiten of ouderen in traditionele Zuid-Afrikaanse culturen (zoals Xhosa of Zulu)?",
+        options: {
+          A: "Door hen indringend in de ogen te kijken.",
+          B: "Door intensief oogcontact juist te vermijden en je blik iets te verlagen tijdens het praten.",
+          C: "Door hen direct bij de voornaam te noemen."
+        },
+        correct: "B",
+        explanation: "In veel Afrikaanse culturen is direct, aanhoudend oogcontact met een meerdere of oudere respectloos. Ooghoogte verlagen toont beleefdheid."
+      },
+      {
+        question: "Welke drie sporten zijn het populairst in Zuid-Afrika?",
+        options: {
+          A: "Voetbal, Rugby en Cricket.",
+          B: "Korfbal, Veldhockey en Tennis.",
+          C: "Handbal, Basketbal en Turnen."
+        },
+        correct: "A",
+        explanation: "Voetbal, Rugby en Cricket domineren de Zuid-Afrikaanse sportwereld en hebben elk hun eigen historische en culturele achtergrond."
+      }
+    ]
+  },
+  oeganda: {
+    title: "Oeganda",
+    questions: [
+      {
+        question: "Hoe is de machtsverhouding tussen sportleraren en leerlingen in Oeganda?",
+        options: {
+          A: "Zeer informeel; leerlingen bepalen de les.",
+          B: "Formeel; docenten en coaches genieten veel respect en instructies worden zonder discussie opgevolgd.",
+          C: "Er is geen hiërarchie."
+        },
+        correct: "B",
+        explanation: "Oeganda heeft een cultuur met een hoge machtsafstand. Autoriteit en leraren worden met veel respect en discipline behandeld."
+      },
+      {
+        question: "Wat is de Oegandese houding ten opzichte van trainingstijden (tijd)?",
+        options: {
+          A: "Militair stipt.",
+          B: "Polychroon en elastisch; transportproblemen en regenbuien zorgen vaak voor vertragingen.",
+          C: "Er worden geen tijden afgesproken."
+        },
+        correct: "B",
+        explanation: "De infrastructuur en het tropische klimaat maken flexibiliteit noodzakelijk. De klok is ondergeschikt aan de situatie."
+      },
+      {
+        question: "Hoe begroet je formeel iemand in Oeganda op een respectvolle manier?",
+        options: {
+          A: "Met een snelle handdruk en directe blik.",
+          B: "Met een rustige, soms langere handdruk waarbij je je linkerhand op je rechteronderarm legt.",
+          C: "Met een knuffel."
+        },
+        correct: "B",
+        explanation: "Net als in Kenia is het ondersteunen van de rechterarm tijdens de begroeting een teken van diep respect en goede manieren."
+      },
+      {
+        question: "Welke waarde is cruciaal binnen de Oegandese gemeenschapsprogramma's?",
+        options: {
+          A: "Individueel succes en competitie.",
+          B: "Samenwerking, delen en zorg dragen voor elkaar binnen de community.",
+          C: "Commercieel winstoogmerk."
+        },
+        correct: "B",
+        explanation: "Oeganda is een collectivistische samenleving. Succes wordt gedeeld en de groep (community) staat altijd boven het individu."
+      },
+      {
+        question: "Wat is een veelvoorkomende uitdaging voor een buurtsportcoach in Oegandese wijken?",
+        options: {
+          A: "Een tekort aan gemotiveerde kinderen.",
+          B: "Slechte sportvelden (hobbelig gras of zand) en weinig ballen; improvisatie is de belangrijkste vaardigheid.",
+          C: "Strikte overheidsregels voor sport."
+        },
+        correct: "B",
+        explanation: "Infrastructuur is vaak basic. Als MBO-coach leer je creatief gebruik te maken van de beschikbare ruimte en middelen."
+      }
+    ]
+  },
+  indonesie: {
+    title: "Indonesië",
+    questions: [
+      {
+        question: "Wat betekent de term 'Jam Karet' (elastische tijd) in Indonesië?",
+        options: {
+          A: "De tijd die je nodig hebt om een elastiek te spannen.",
+          B: "Tijd is flexibel; afspraken starten vaak later dan gepland en haast wordt als onbeleefd gezien.",
+          C: "De duur van een badmintonwedstrijd."
+        },
+        correct: "B",
+        explanation: "'Jam Karet' (rubberen tijd) is een bekend concept. Geduld en flexibiliteit zijn essentieel in de Indonesische cultuur."
+      },
+      {
+        question: "Welke sport heeft een absolute status en is de nationale trots van Indonesië?",
+        options: {
+          A: "Badminton (Bulu Tangkis).",
+          B: "Veldhockey.",
+          C: "Rugby."
+        },
+        correct: "A",
+        explanation: "Badminton is de nationale sport. Indonesische spelers behoren al decennia tot de absolute wereldtop en winnen veel Olympische medailles."
+      },
+      {
+        question: "Hoe geef je als Nederlandse coach respectvol feedback aan een Indonesische sporter?",
+        options: {
+          A: "Direct en hard voor de hele groep, zodat iedereen leert.",
+          B: "Indirect, een-op-een en verpakt in complimenten om gezichtsverlies (malu) te voorkomen.",
+          C: "Schriftelijk via een officieel formulier."
+        },
+        correct: "B",
+        explanation: "Gezichtsverlies ('malu') is een groot taboe in Aziatische collectivistische culturen. Kritiek geef je subtiel en privé."
+      },
+      {
+        question: "Wat is de betekenis van 'Gotong Royong' op het sportveld?",
+        options: {
+          A: "Een type vechtsport.",
+          B: "Wederzijdse hulp en samenwerking; samen de materialen opruimen en elkaar ondersteunen.",
+          C: "De naam van de scheidsrechter."
+        },
+        correct: "B",
+        explanation: "'Gotong royong' is de traditionele Indonesische waarde van gemeenschappelijke samenwerking en solidariteit."
+      },
+      {
+        question: "Hoe spreek je je Indonesische stagebegeleider of hoofddocent respectvol aan?",
+        options: {
+          A: "Bij zijn of haar voornaam.",
+          B: "Met 'Bapak' (voor een man) of 'Ibu' (voor een vrouw) gevolgd door de naam.",
+          C: "Met 'Hey bro!'"
+        },
+        correct: "B",
+        explanation: "'Bapak' (vader/meneer) en 'Ibu' (moeder/mevrouw) zijn de verplichte respecttitels voor ouderen en leidinggevenden."
+      }
+    ]
+  },
+  australie: {
+    title: "Australië",
+    questions: [
+      {
+        question: "Wat betekent het begrip 'Mateship' in de Australische sportcultuur?",
+        options: {
+          A: "De scheidsrechter is altijd je vriend.",
+          B: "Gelijkheid, loyaliteit en intense steun aan je teamgenoten ('mates').",
+          C: "Een verplichte zeiltocht voor sporters."
+        },
+        correct: "B",
+        explanation: "'Mateship' is een kernwaarde in Australië en staat voor broederschap, gelijkwaardigheid en elkaar door dik en dun steunen."
+      },
+      {
+        question: "Hoe is de hiërarchie tussen de coach en de sporter in Australië?",
+        options: {
+          A: "Heel formeel; de coach beslist alles zonder overleg.",
+          B: "Informeel en plat; communicatie is direct, joviaal en op basis van gelijkwaardigheid.",
+          C: "Er is geen coach, de groep beslist."
+        },
+        correct: "B",
+        explanation: "Australiërs houden niet van overdreven formaliteit of hiërarchie (lage machtsafstand). Iedereen is gelijk."
+      },
+      {
+        question: "Welke twee sporten domineren de Australische wintermaanden?",
+        options: {
+          A: "Australisch Voetbal (AFL / Aussie Rules) en Rugby.",
+          B: "Veldhockey en Korfbal.",
+          C: "Schaatsen en Langlaufen."
+        },
+        correct: "A",
+        explanation: "Aussie Rules (AFL) en Rugby (League/Union) zijn mateloos populair en trekken wekelijks tienduizenden fans naar de stadions."
+      },
+      {
+        question: "Wat is 'No worries' in de communicatiestijl van een Australische coach?",
+        options: {
+          A: "Je hoeft je nergens zorgen over te maken, we lossen het flexibel op.",
+          B: "Het is verboden om je zorgen te maken.",
+          C: "Een tactisch verdedigingssysteem."
+        },
+        correct: "A",
+        explanation: "'No worries' is de nationale Australische slogan en weerspiegelt de relaxte, optimistische en pragmatische instelling."
+      },
+      {
+        question: "Hoe belangrijk is de zwem- en strandsportcultuur in Australië?",
+        options: {
+          A: "Totaal onbelangrijk; zwemmen is alleen voor toeristen.",
+          B: "Enorm belangrijk; zwemmen is een basisvaardigheid en 'Surf Life Saving' clubs zijn legendarische wijkcentra.",
+          C: "Alleen populair in de winter."
+        },
+        correct: "B",
+        explanation: "Vanwege het klimaat en de kustlijn is waterveiligheid en strandsport (surf lifesaving) een essentieel onderdeel van de cultuur."
+      }
+    ]
+  }
+};
+
+
+    // ==========================================
+    // SUPABASE REALTIME CONFIGURATION
+    // ==========================================
+    const DEFAULT_SUPABASE_URL = 'https://rgbwbzmoulkxuqbyvgxx.supabase.co';
+    const DEFAULT_SUPABASE_KEY = 'sb_publishable_uy0ywC3sbmt0cfP_YnfZiA_J0sZkwFW';
+
+    let supabaseClient = null;
+    let realtimeChannel = null;
+
+    try {
+      if (typeof supabase !== 'undefined') {
+        supabaseClient = supabase.createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
+      }
+    } catch (e) {
+      console.warn('Supabase init notice:', e);
+    }
+
+    // ==========================================
+    // OFFICIAL MARIO KART CHARACTERS (11 Racers)
+    // ==========================================
+    const MARIO_KART_CHARACTERS = [
+      { id: 'mario', name: 'Mario', emoji: '\u{1F344}', color: '#ef4444', desc: 'All-Rounder' },
+      { id: 'luigi', name: 'Luigi', emoji: '\u{1F3CE}\u{FE0F}', color: '#10b981', desc: 'Precision Drifter' },
+      { id: 'peach', name: 'Peach', emoji: '\u{1F451}', color: '#ec4899', desc: 'Smooth Handling' },
+      { id: 'yoshi', name: 'Yoshi', emoji: '\u{1F95A}', color: '#84cc16', desc: 'Quick Acceleration' },
+      { id: 'bowser', name: 'Bowser', emoji: '\u{1F422}', color: '#ea580c', desc: 'Heavyweight Tank' },
+      { id: 'toad', name: 'Toad', emoji: '\u{26A1}', color: '#3b82f6', desc: 'Light & Nimble' },
+      { id: 'donkeykong', name: 'Donkey Kong', emoji: '\u{1F435}', color: '#b45309', desc: 'Banana Master' },
+      { id: 'wario', name: 'Wario', emoji: '\u{1F4B0}', color: '#eab308', desc: 'Bulldozer Grip' },
+      { id: 'waluigi', name: 'Waluigi', emoji: '\u{1F3BE}', color: '#8b5cf6', desc: 'Sneaky Tactician' },
+      { id: 'rosalina', name: 'Rosalina', emoji: '\u{2728}', color: '#06b6d4', desc: 'Cosmic Cruiser' },
+      { id: 'daisy', name: 'Daisy', emoji: '\u{1F33C}', color: '#f59e0b', desc: 'Energetic Striker' }
+    ];
+
+    // MARIO KART POWER-UPS
+    const POWER_UPS = [
+      { id: 'mushroom', name: 'Turbo Paddenstoel', emoji: '\u{1F344}', desc: '+200m Turbo Sprint!' },
+      { id: 'banana', name: 'Bananenschil', emoji: '\u{1F34C}', desc: 'Laat een concurrent 360\u00B0 slippen (-100m)!' },
+      { id: 'shell', name: 'Groen Schild', emoji: '\u{1F422}', desc: 'Directe inhaalslag op je voorligger!' },
+      { id: 'blueshell', name: 'Blauwe Schild', emoji: '\u{1F422}\u{1F499}', desc: 'Target de koploper en schakel diens voorsprong terug!' },
+      { id: 'star', name: 'Star Power', emoji: '\u{1F31F}', desc: 'Onkwetsbaar + dubbele snelheid!' }
+    ];
+
+    // ==========================================
+    // AUDIO SYNTHESIZER (Web Audio API)
+    // ==========================================
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15, vol = 0.2) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSound(name) {
+      if (!soundEnabled) return;
+      initAudio();
+      switch (name) {
+        case 'countdown': playTone(440, 'triangle', 0.12, 0.15); break;
+        case 'go': playTone(880, 'square', 0.35, 0.25); break;
+        case 'correct':
+          playTone(523, 'triangle', 0.08, 0.2);
+          setTimeout(() => playTone(659, 'triangle', 0.08, 0.2), 70);
+          setTimeout(() => playTone(784, 'triangle', 0.25, 0.25), 140);
+          break;
+        case 'wrong':
+          playTone(220, 'sawtooth', 0.18, 0.25);
+          setTimeout(() => playTone(165, 'sawtooth', 0.35, 0.25), 150);
+          break;
+        case 'turbo':
+          for (let i = 0; i < 8; i++) setTimeout(() => playTone(300 + i * 80, 'sawtooth', 0.05, 0.15), i * 30);
+          break;
+        case 'slip':
+          for (let i = 0; i < 6; i++) setTimeout(() => playTone(800 - i * 90, 'sine', 0.05, 0.2), i * 40);
+          break;
+        case 'blueshell':
+          playTone(350, 'sawtooth', 0.2, 0.2);
+          setTimeout(() => playTone(700, 'square', 0.4, 0.3), 200);
+          break;
+        case 'victory':
+          [523, 659, 784, 1046].forEach((n, idx) => setTimeout(() => playTone(n, 'triangle', 0.2, 0.25), idx * 120));
+          break;
+      }
+    }
+
+    // ==========================================
+    // QUESTIONS DATA MANAGEMENT
+    // ==========================================
+    let gameQuestions = null;
+
+    function loadActiveQuestions() {
+      const stored = localStorage.getItem('CIOS_GLOBETROTTER_QUESTIONS');
+      if (stored) {
+        try { gameQuestions = JSON.parse(stored); return; } catch (e) {}
+      }
+      if (typeof QUESTIONS !== 'undefined') {
+        gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
+      } else {
+        gameQuestions = {};
+      }
+    }
+
+    // ==========================================
+    // GAME STATE
+    // ==========================================
+    const State = {
+      role: 'host', // 'host' (digibord) or 'player' (student)
+      gamePin: 'CIOS-2627',
+      circuit: 'world',
+      totalLaps: 10,
+      currentLap: 1,
+      players: [],
+      myPlayerId: null,
+      currentQuestion: null,
+      timerSec: 25,
+      timerInterval: null,
+      allowItems: true,
+      allowBlueShell: true,
+      allowJokers: true,
+      raceFinished: false,
+      canvasAnimId: null,
+      trackSpline: []
+    };
+
+    // ==========================================
+    // REALTIME NETWORKING (Broadcast Rooms)
+    // ==========================================
+    function initRealtimeRoom() {
+      if (!supabaseClient) return;
+
+      const roomName = `room-${State.gamePin.toLowerCase()}`;
+      realtimeChannel = supabaseClient.channel(roomName, {
+        config: { broadcast: { self: false } }
+      });
+
+      realtimeChannel
+        .on('broadcast', { event: 'player-join' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerJoined(payload);
+        })
+        .on('broadcast', { event: 'game-start' }, ({ payload }) => {
+          if (State.role === 'player') handleGameStartedByHost(payload);
+        })
+        .on('broadcast', { event: 'question-sync' }, ({ payload }) => {
+          if (State.role === 'player') handleQuestionSync(payload);
+        })
+        .on('broadcast', { event: 'answer-submit' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerAnswer(payload);
+        })
+        .on('broadcast', { event: 'item-deploy' }, ({ payload }) => {
+          if (State.role === 'host') handlePlayerItem(payload);
+        })
+        .on('broadcast', { event: 'state-broadcast' }, ({ payload }) => {
+          if (State.role === 'player') handleStateSyncFromHost(payload);
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log(`Connected to Realtime Room: ${roomName}`);
+          }
+        });
+    }
+
+    function broadcastEvent(event, payload) {
+      if (realtimeChannel) {
+        realtimeChannel.send({ type: 'broadcast', event, payload }).catch(()=>{});
+      }
+    }
+
+    // ==========================================
+    // 2D CANVAS MARIO KART CIRCUIT ENGINE
+    // ==========================================
+    function initTrackCanvas() {
+      const canvas = document.getElementById('race-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Precompute Circuit Path Points (Grand Prix Oval with Chicane)
+      const w = canvas.width;
+      const h = canvas.height;
+      const points = [];
+      const steps = 200;
+
+      for (let i = 0; i < steps; i++) {
+        const t = (i / steps) * Math.PI * 2;
+        // Formula for a smooth, curved grand prix loop
+        const rx = (w / 2) - 100;
+        const ry = (h / 2) - 65;
+        const cx = w / 2;
+        const cy = h / 2;
+
+        let x = cx + rx * Math.cos(t);
+        let y = cy + ry * Math.sin(t);
+
+        // Add chicane bend
+        if (t > Math.PI * 0.2 && t < Math.PI * 0.8) {
+          y += Math.sin(t * 3) * 20;
+        }
+
+        points.push({ x, y });
+      }
+      State.trackSpline = points;
+
+      // Start render loop
+      if (State.canvasAnimId) cancelAnimationFrame(State.canvasAnimId);
+      function render() {
+        drawTrack(ctx, canvas.width, canvas.height);
+        drawKarts(ctx);
+        State.canvasAnimId = requestAnimationFrame(render);
+      }
+      render();
+    }
+
+    function drawTrack(ctx, w, h) {
+      // 1. Green Infield & Grass Background
+      ctx.fillStyle = '#1b7a42';
+      ctx.fillRect(0, 0, w, h);
+
+      // Infield terrain accents
+      ctx.fillStyle = '#166536';
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2, 70, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Red & White Rumble Strips (Curbstones)
+      ctx.lineWidth = 76;
+      ctx.strokeStyle = '#e74c3c';
+      ctx.setLineDash([18, 18]);
+      ctx.beginPath();
+      State.trackSpline.forEach((p, idx) => {
+        if (idx === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+      ctx.closePath();
+      ctx.stroke();
+
+      // White dashes
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineDashOffset = 18;
+      ctx.stroke();
+
+      // 3. Dark Asphalt Track Road
+      ctx.setLineDash([]);
+      ctx.lineWidth = 62;
+      ctx.strokeStyle = '#2d3436';
+      ctx.stroke();
+
+      // 4. White Dashed Center Line
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.setLineDash([10, 10]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 5. Checkered Finish Line at Start
+      const startP = State.trackSpline[0];
+      const nextP = State.trackSpline[1];
+      const angle = Math.atan2(nextP.y - startP.y, nextP.x - startP.x) + Math.PI / 2;
+
+      ctx.save();
+      ctx.translate(startP.x, startP.y);
+      ctx.rotate(angle);
+      for (let r = -30; r < 30; r += 10) {
+        ctx.fillStyle = (Math.floor(r / 10) % 2 === 0) ? '#ffffff' : '#000000';
+        ctx.fillRect(r, -4, 10, 8);
+      }
+      ctx.restore();
+    }
+
+    function getTrackCoordinates(pct) {
+      if (!State.trackSpline || State.trackSpline.length === 0) return { x: 100, y: 100, angle: 0 };
+      const normalized = Math.max(0, Math.min(100, pct)) / 100;
+      const idx = Math.floor(normalized * (State.trackSpline.length - 1));
+      const nextIdx = (idx + 1) % State.trackSpline.length;
+
+      const p1 = State.trackSpline[idx];
+      const p2 = State.trackSpline[nextIdx];
+      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
+      return { x: p1.x, y: p1.y, angle };
+    }
+
+    function drawKarts(ctx) {
+      if (!State.players) return;
+
+      State.players.forEach((player, rankIdx) => {
+        const { x, y, angle } = getTrackCoordinates(player.progress);
+
+        // Stagger lanes slightly so karts don't fully overlap
+        const laneOffset = ((player.id % 5) - 2) * 8;
+        const finalX = x + Math.cos(angle + Math.PI/2) * laneOffset;
+        const finalY = y + Math.sin(angle + Math.PI/2) * laneOffset;
+
+        ctx.save();
+        ctx.translate(finalX, finalY);
+
+        // Spin slip animation if active
+        if (player.spinning) {
+          ctx.rotate(player.spinAngle || 0);
+          player.spinAngle = (player.spinAngle || 0) + 0.4;
+        } else {
+          ctx.rotate(angle);
+        }
+
+        // Draw Kart Body
+        ctx.fillStyle = player.color || '#ff4757';
+        ctx.beginPath();
+        ctx.roundRect(-12, -7, 24, 14, 4);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Wheels
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-10, -9, 6, 2);
+        ctx.fillRect(4, -9, 6, 2);
+        ctx.fillRect(-10, 7, 6, 2);
+        ctx.fillRect(4, 7, 6, 2);
+
+        // Character Emoji Head
+        ctx.font = '14px Outfit, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(player.emoji || '\u{1F344}', 0, 0);
+
+        // Turbo Flames if boosted
+        if (player.boosted) {
+          ctx.font = '12px Outfit';
+          ctx.fillText('\u{1F525}', -18, 0);
+        }
+
+        // Student Name Tag above Kart
+        ctx.rotate(-angle);
+        ctx.font = 'bold 9px Plus Jakarta Sans, sans-serif';
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(-24, -20, 48, 12);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(player.name.substring(0, 8), 0, -14);
+
+        ctx.restore();
+      });
+    }
+
+    // ==========================================
+    // SETUP & AVATAR PICKER
+    // ==========================================
+    let selectedCharId = 'mario';
+
+    function initAvatarPicker() {
+      const grid = document.getElementById('avatar-picker-grid');
+      grid.innerHTML = '';
+      MARIO_KART_CHARACTERS.forEach(char => {
+        const btn = document.createElement('div');
+        btn.className = 'avatar-btn' + (char.id === selectedCharId ? ' active' : '');
+        btn.innerHTML = `
+          <span class="emoji">${char.emoji}</span>
+          <span class="name" style="color:${char.color};">${char.name}</span>
+        `;
+        btn.onclick = () => {
+          document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedCharId = char.id;
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    // ==========================================
+    // ROLE SWITCHING (Host Digibord vs Player)
+    // ==========================================
+    function switchRole(role) {
+      State.role = role;
+      document.getElementById('role-host-btn').classList.toggle('active', role === 'host');
+      document.getElementById('role-player-btn').classList.toggle('active', role === 'player');
+
+      // Hide all main screens
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+      if (role === 'host') {
+        document.getElementById('host-lobby-screen').classList.add('active');
+      } else {
+        document.getElementById('player-lobby-screen').classList.add('active');
+      }
+
+      initRealtimeRoom();
+    }
+
+    // ==========================================
+    // HOST DIGIBORD LOBBY
+    // ==========================================
+    function handlePlayerJoined(payload) {
+      if (State.players.some(p => p.id === payload.id)) return;
+      State.players.push({
+        id: payload.id,
+        name: payload.name,
+        charId: payload.charId,
+        emoji: payload.emoji,
+        color: payload.color,
+        progress: 5,
+        score: 0,
+        item: null,
+        starRounds: 0,
+        boosted: false,
+        spinning: false,
+        streak: 0
+      });
+
+      updateRosterDisplay();
+      playSound('correct');
+    }
+
+    function updateRosterDisplay() {
+      const grid = document.getElementById('roster-grid');
+      grid.innerHTML = '';
+      document.getElementById('roster-count').innerText = State.players.length;
+
+      State.players.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'roster-kart-card';
+        card.style.borderColor = p.color;
+        card.innerHTML = `
+          <span class="roster-emoji">${p.emoji}</span>
+          <span class="roster-name">${p.name}</span>
+          <span class="roster-char" style="color:${p.color};">${p.charId.toUpperCase()}</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function addBots() {
+      const botNames = ['Max Verstappen', 'Ranomi K.', 'Sven Kramer', 'Femke Bol', 'Virgil v. Dijk'];
+      botNames.forEach((name, idx) => {
+        const char = MARIO_KART_CHARACTERS[idx % MARIO_KART_CHARACTERS.length];
+        handlePlayerJoined({
+          id: `bot-${idx}`,
+          name: name,
+          charId: char.id,
+          emoji: char.emoji,
+          color: char.color
+        });
+      });
+    }
+
+    // ==========================================
+    // STARTING THE GRAND PRIX
+    // ==========================================
+    function startHostGrandPrix() {
+      if (State.players.length === 0) {
+        addBots(); // Ensure at least bots exist if docent clicks start directly
+      }
+
+      State.circuit = document.getElementById('circuit-select').value;
+      State.totalLaps = parseInt(document.getElementById('race-rounds').value);
+      State.currentLap = 1;
+      State.raceFinished = false;
+
+      document.getElementById('host-lobby-screen').classList.remove('active');
+      document.getElementById('host-race-screen').classList.add('active');
+
+      document.getElementById('arena-total-laps').innerText = State.totalLaps;
+      document.getElementById('arena-player-count-tag').innerText = `${State.players.length} Racers op de baan`;
+
+      initTrackCanvas();
+      playSound('go');
+
+      // Broadcast start to student phones
+      broadcastEvent('game-start', {
+        circuit: State.circuit,
+        totalLaps: State.totalLaps
+      });
+
+      nextHostTurn();
+    }
+
+    function getCountriesForCircuit(circuitKey) {
+      const pools = {
+        europa: ['nederland', 'spanje', 'duitsland', 'frankrijk', 'italie', 'verenigd_koninkrijk'],
+        cariben: ['aruba', 'bonaire', 'curacao', 'suriname', 'brazilie', 'colombia'],
+        safari: ['kenia', 'zuid_afrika', 'oeganda', 'indonesie', 'australie'],
+        world: Object.keys(gameQuestions)
+      };
+      return pools[circuitKey] || pools.world;
+    }
+
+    function nextHostTurn() {
+      if (State.raceFinished) return;
+      clearInterval(State.timerInterval);
+
+      // Check if leader crossed finish line
+      const maxProgress = Math.max(...State.players.map(p => p.progress));
+      if (maxProgress >= 95 || State.currentLap > State.totalLaps) {
+        finishGrandPrixHost();
+        return;
+      }
+
+      document.getElementById('arena-current-lap').innerText = State.currentLap;
+
+      // Pick Random Question
+      const countries = getCountriesForCircuit(State.circuit);
+      const randomCountryKey = countries[Math.floor(Math.random() * countries.length)];
+      const cData = gameQuestions[randomCountryKey];
+
+      if (!cData || !cData.questions || cData.questions.length === 0) return;
+      const q = cData.questions[Math.floor(Math.random() * cData.questions.length)];
+      State.currentQuestion = { ...q, country: cData.title || randomCountryKey };
+
+      // Update Host Digibord UI
+      document.getElementById('arena-q-topic').innerHTML = `&#x1F30D; ${State.currentQuestion.country} | Sportcultuur`;
+      document.getElementById('arena-checkpoint-tag').innerHTML = `&#x1F30D; Checkpoint ${State.currentLap}: ${State.currentQuestion.country}`;
+      document.getElementById('arena-question-text').innerText = q.question;
+
+      const optContainer = document.getElementById('arena-options-container');
+      optContainer.innerHTML = '';
+      ['A', 'B', 'C'].forEach(l => {
+        if (q.options && q.options[l]) {
+          const btn = document.createElement('div');
+          btn.className = 'opt-live-btn';
+          btn.id = `arena-opt-${l}`;
+          btn.innerHTML = `<strong>${l}:</strong> <span>${q.options[l]}</span>`;
+          optContainer.appendChild(btn);
+        }
+      });
+
+      // Broadcast Question to Student Phones
+      broadcastEvent('question-sync', {
+        question: q.question,
+        options: q.options,
+        country: State.currentQuestion.country,
+        lap: State.currentLap
+      });
+
+      startHostTimer();
+    }
+
+    function startHostTimer() {
+      State.timerSec = 25;
+      document.getElementById('arena-timer-num').innerText = State.timerSec;
+
+      State.timerInterval = setInterval(() => {
+        State.timerSec--;
+        document.getElementById('arena-timer-num').innerText = State.timerSec;
+
+        if (State.timerSec <= 5 && State.timerSec > 0) playSound('countdown');
+
+        if (State.timerSec <= 0) {
+          clearInterval(State.timerInterval);
+          handleRoundTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleRoundTimeout() {
+      // Simulate Bot answers if bots are present
+      State.players.filter(p => p.id.startsWith('bot-')).forEach(b => {
+        if (Math.random() < 0.65) {
+          b.progress = Math.min(95, b.progress + (100 / State.totalLaps));
+        }
+      });
+
+      updateArenaLeaderboard();
+      showFeedbackModal(false, State.currentQuestion.explanation);
+    }
+
+    // ==========================================
+    // PLAYER CONTROLLER LOGIC (Student Phone)
+    // ==========================================
+    function joinAsPlayer() {
+      const name = document.getElementById('player-name-input').value.trim();
+      const pin = document.getElementById('player-pin-input').value.trim();
+      if (!name) { alert('Vul alsjeblieft je naam in!'); return; }
+
+      State.gamePin = pin || 'CIOS-2627';
+      State.myPlayerId = `player-${Date.now()}`;
+      const char = MARIO_KART_CHARACTERS.find(c => c.id === selectedCharId);
+
+      initRealtimeRoom();
+
+      // Broadcast to host
+      broadcastEvent('player-join', {
+        id: State.myPlayerId,
+        name: name,
+        charId: char.id,
+        emoji: char.emoji,
+        color: char.color
+      });
+
+      // Update student hero card
+      document.getElementById('player-card-name').innerText = name;
+      document.getElementById('player-card-emoji').innerText = char.emoji;
+      document.getElementById('player-card-character').innerText = char.name;
+
+      document.getElementById('player-lobby-screen').classList.remove('active');
+      document.getElementById('player-race-screen').classList.add('active');
+
+      logEvent(`\u{1F3C1} Aangemeld als ${name} (${char.name})! Wachten op startsein van docent...`);
+    }
+
+    function handleGameStartedByHost(payload) {
+      playSound('go');
+      alert('\u{1F3C1} DE GRAND PRIX GAAT VAN START! Bereid je voor!');
+    }
+
+    function handleQuestionSync(payload) {
+      document.getElementById('player-q-country').innerText = payload.country;
+      document.getElementById('player-q-prompt').innerText = payload.question;
+
+      const grid = document.getElementById('player-options-grid');
+      grid.innerHTML = '';
+
+      ['A', 'B', 'C'].forEach(l => {
+        if (payload.options && payload.options[l]) {
+          const btn = document.createElement('button');
+          btn.className = 'opt-live-btn';
+          btn.style.padding = '14px';
+          btn.innerHTML = `<strong style="color:var(--gold); font-size:1.1rem; width:28px;">${l}</strong> <span>${payload.options[l]}</span>`;
+          btn.onclick = () => submitPlayerAnswer(l);
+          grid.appendChild(btn);
+        }
+      });
+    }
+
+    function submitPlayerAnswer(letter) {
+      document.querySelectorAll('#player-options-grid button').forEach(b => b.disabled = true);
+      broadcastEvent('answer-submit', {
+        playerId: State.myPlayerId,
+        answer: letter
+      });
+      playSound('turbo');
+    }
+
+    // ==========================================
+    // ANSWER PROCESSING (Host on Digibord)
+    // ==========================================
+    function handlePlayerAnswer(payload) {
+      const player = State.players.find(p => p.id === payload.playerId);
+      if (!player || !State.currentQuestion) return;
+
+      const isCorrect = (payload.answer === State.currentQuestion.correct);
+
+      if (isCorrect) {
+        player.score += 100;
+        player.streak++;
+
+        let meters = (100 / State.totalLaps);
+        if (State.timerSec > 15) meters *= 1.25; // Speed boost
+
+        if (player.starRounds > 0) {
+          meters *= 2;
+          player.starRounds--;
+        }
+
+        player.progress = Math.min(95, player.progress + meters);
+        player.boosted = true;
+        setTimeout(() => player.boosted = false, 1200);
+
+        // Roll Mario Kart item if none
+        if (State.allowItems && !player.item) {
+          rollPlayerItem(player);
+        }
+
+        logArenaEvent(`\u{26A1} ${player.name} (${player.charId.toUpperCase()}) antwoordt GOED (+${Math.round(meters*10)}m)!`);
+      } else {
+        player.streak = 0;
+        player.spinning = true;
+        setTimeout(() => player.spinning = false, 800);
+        logArenaEvent(`\u{1F34C} ${player.name} slipt op een fout antwoord!`);
+      }
+
+      updateArenaLeaderboard();
+      syncStateToStudents();
+    }
+
+    function rollPlayerItem(player) {
+      const sorted = [...State.players].sort((a,b) => b.progress - a.progress);
+      const rank = sorted.findIndex(p => p.id === player.id) + 1;
+
+      let item = null;
+      if (rank >= 7 && State.allowBlueShell && Math.random() < 0.45) {
+        item = POWER_UPS.find(p => p.id === 'blueshell');
+      } else {
+        const pool = POWER_UPS.filter(p => p.id !== 'blueshell');
+        item = pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      player.item = item;
+      logArenaEvent(`\u{1F381} ${player.name} ontving een [${item.emoji} ${item.name}]!`);
+    }
+
+    function syncStateToStudents() {
+      const sorted = [...State.players].sort((a,b) => b.progress - a.progress);
+      broadcastEvent('state-broadcast', {
+        players: sorted.map((p, idx) => ({
+          id: p.id,
+          name: p.name,
+          progress: Math.round(p.progress),
+          rank: idx + 1,
+          item: p.item
+        }))
+      });
+    }
+
+    function handleStateSyncFromHost(payload) {
+      const me = payload.players.find(p => p.id === State.myPlayerId);
+      if (me) {
+        document.getElementById('player-card-rank').innerText = `P${me.rank}`;
+        document.getElementById('player-card-progress').innerText = `${me.progress}% van de baan`;
+
+        const itemBtn = document.getElementById('player-item-btn');
+        if (me.item) {
+          document.getElementById('player-item-emoji').innerText = me.item.emoji;
+          document.getElementById('player-item-text').innerText = `${me.item.name} (TIK OM IN TE ZETTEN!)`;
+          itemBtn.style.borderColor = 'var(--accent)';
+          itemBtn.onclick = () => {
+            broadcastEvent('item-deploy', { playerId: State.myPlayerId, itemId: me.item.id });
+            document.getElementById('player-item-emoji').innerText = '\u{2753}';
+            document.getElementById('player-item-text').innerText = 'Item ingezet!';
+            itemBtn.onclick = null;
+          };
+        } else {
+          document.getElementById('player-item-emoji').innerText = '\u{2753}';
+          document.getElementById('player-item-text').innerText = 'Geen item';
+          itemBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+          itemBtn.onclick = null;
+        }
+      }
+    }
+
+    function handlePlayerItem(payload) {
+      const player = State.players.find(p => p.id === payload.playerId);
+      if (!player || !player.item) return;
+      const item = player.item;
+      player.item = null;
+
+      switch (item.id) {
+        case 'mushroom':
+          player.progress = Math.min(95, player.progress + 14);
+          player.boosted = true;
+          setTimeout(() => player.boosted = false, 1200);
+          playSound('turbo');
+          logArenaEvent(`\u{1F344} TURBO BOOST! ${player.name} schiet vooruit!`);
+          break;
+        case 'banana':
+          const leader = [...State.players].sort((a,b) => b.progress - a.progress)[0];
+          if (leader.id !== player.id) {
+            leader.progress = Math.max(5, leader.progress - 10);
+            leader.spinning = true;
+            setTimeout(() => leader.spinning = false, 800);
+            playSound('slip');
+            logArenaEvent(`\u{1F34C} BANAAN! ${player.name} liet ${leader.name} slippen (-100m)!`);
+          }
+          break;
+        case 'shell':
+          player.progress = Math.min(95, player.progress + 10);
+          playSound('turbo');
+          logArenaEvent(`\u{1F422} GROEN SCHILD! ${player.name} passeert een rivaal!`);
+          break;
+        case 'blueshell':
+          const rank1 = [...State.players].sort((a,b) => b.progress - a.progress)[0];
+          rank1.progress = Math.max(5, rank1.progress - 16);
+          rank1.spinning = true;
+          setTimeout(() => rank1.spinning = false, 1000);
+          playSound('blueshell');
+          logArenaEvent(`\u{1F499} BLAUWE SCHILD INSLAG! Koploper ${rank1.name} werd geraakt (-160m)!`);
+          break;
+        case 'star':
+          player.starRounds = 2;
+          playSound('turbo');
+          logArenaEvent(`\u{1F31F} STAR POWER geactiveerd voor ${player.name}!`);
+          break;
+      }
+
+      updateArenaLeaderboard();
+      syncStateToStudents();
+    }
+
+    function updateArenaLeaderboard() {
+      const sorted = [...State.players].sort((a,b) => (b.progress * 100 + b.score) - (a.progress * 100 + a.score));
+      const list = document.getElementById('arena-ranking-list');
+      list.innerHTML = '';
+
+      sorted.forEach((p, idx) => {
+        const item = document.createElement('div');
+        item.className = 'live-ranking-item';
+        item.style.borderLeftColor = p.color;
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-family:var(--font-arcade); font-size:0.75rem; color:var(--gold); width:20px;">P${idx + 1}</span>
+            <span>${p.emoji}</span>
+            <strong style="color:${p.color};">${p.name}</strong>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            ${p.item ? `<span>${p.item.emoji}</span>` : ''}
+            <span style="font-family:var(--font-arcade); font-size:0.75rem; color:var(--accent);">${Math.round(p.progress)}%</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      if (sorted.length > 0) {
+        document.getElementById('arena-leader-tag').innerText = `P1: ${sorted[0].name} (${sorted[0].charId.toUpperCase()})`;
+      }
+    }
+
+    function logArenaEvent(msg) {
+      const feed = document.getElementById('arena-event-feed');
+      const div = document.createElement('div');
+      div.style.marginBottom = '3px';
+      div.innerHTML = msg;
+      feed.prepend(div);
+    }
+
+    function showFeedbackModal(isCorrect, explanation) {
+      const modal = document.getElementById('feedback-modal');
+      document.getElementById('feedback-icon').innerHTML = isCorrect ? '&#x26A1;&#x1F4A8;' : '&#x1F34C;&#x1F4A5;';
+      document.getElementById('feedback-title').innerText = isCorrect ? 'SUPER SPRINT!' : 'SLIPPER OP HET ASFALT!';
+      document.getElementById('feedback-title').style.color = isCorrect ? 'var(--accent)' : 'var(--primary)';
+      document.getElementById('feedback-text').innerHTML = `<strong>Toelichting:</strong><br>${explanation || "Blijf scherp op de sportcultuur!"}`;
+
+      modal.classList.add('active');
+      document.getElementById('feedback-next-btn').onclick = () => {
+        modal.classList.remove('active');
+        State.currentLap++;
+        nextHostTurn();
+      };
+    }
+
+    // ==========================================
+    // PODIUM & CERTIFICATE
+    // ==========================================
+    function finishGrandPrixHost() {
+      State.raceFinished = true;
+      clearInterval(State.timerInterval);
+
+      document.getElementById('host-race-screen').classList.remove('active');
+      document.getElementById('podium-screen').classList.add('active');
+
+      const sorted = [...State.players].sort((a,b) => (b.progress * 100 + b.score) - (a.progress * 100 + a.score));
+      playSound('victory');
+      startConfetti();
+
+      if (sorted[0]) {
+        document.getElementById('podium-1-emoji').innerText = sorted[0].emoji;
+        document.getElementById('podium-1-name').innerText = sorted[0].name;
+      }
+      if (sorted[1]) {
+        document.getElementById('podium-2-emoji').innerText = sorted[1].emoji;
+        document.getElementById('podium-2-name').innerText = sorted[1].name;
+      }
+      if (sorted[2]) {
+        document.getElementById('podium-3-emoji').innerText = sorted[2].emoji;
+        document.getElementById('podium-3-name').innerText = sorted[2].name;
+      }
+
+      document.getElementById('podium-cert-btn').onclick = () => {
+        alert(`Kampioenen Certificaat voor: ${sorted[0].name} (${sorted[0].charId})! Druk op Ctrl+P om af te drukken.`);
+        window.print();
+      };
+    }
+
+    function startConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#ffffff'];
+      for (let i = 0; i < 160; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 4 + 2,
+          speedX: Math.random() * 2 - 1
+        });
+      }
+
+      let frame = 0;
+      function loop() {
+        if (frame > 220) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+        frame++;
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    // ==========================================
+    // QUESTIONS EDITOR SETUP
+    // ==========================================
+    function setupQuestionsEditor() {
+      const filter = document.getElementById('editor-country-filter');
+      filter.innerHTML = '';
+      Object.keys(gameQuestions).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.innerText = gameQuestions[k].title || k;
+        filter.appendChild(opt);
+      });
+
+      filter.onchange = () => renderEditorQuestions(filter.value);
+      renderEditorQuestions(filter.value);
+
+      document.getElementById('editor-open-btn').onclick = () => {
+        setupQuestionsEditor();
+        document.getElementById('questions-editor-modal').classList.add('active');
+      };
+      document.getElementById('editor-close-btn').onclick = () => {
+        document.getElementById('questions-editor-modal').classList.remove('active');
+      };
+
+      document.getElementById('save-questions-btn').onclick = () => {
+        localStorage.setItem('CIOS_GLOBETROTTER_QUESTIONS', JSON.stringify(gameQuestions));
+        alert('Vragen opgeslagen in de browser!');
+      };
+      document.getElementById('export-questions-btn').onclick = () => {
+        const blob = new Blob([JSON.stringify(gameQuestions, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Globetrotter_CIOS_Vragen.json';
+        a.click();
+      };
+      document.getElementById('import-questions-btn').onclick = () => document.getElementById('import-file-input').click();
+      document.getElementById('import-file-input').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            gameQuestions = JSON.parse(evt.target.result);
+            localStorage.setItem('CIOS_GLOBETROTTER_QUESTIONS', JSON.stringify(gameQuestions));
+            setupQuestionsEditor();
+            alert('Vragen succesvol geÃ¯mporteerd!');
+          } catch (err) { alert('Fout: ' + err.message); }
+        };
+        reader.readAsText(file);
+      };
+      document.getElementById('reset-questions-btn').onclick = () => {
+        if (confirm('Vragen terugzetten naar origineel?')) {
+          localStorage.removeItem('CIOS_GLOBETROTTER_QUESTIONS');
+          loadActiveQuestions();
+          setupQuestionsEditor();
+          alert('Vragen hersteld!');
+        }
+      };
+    }
+
+    function renderEditorQuestions(countryKey) {
+      const container = document.getElementById('editor-questions-list');
+      container.innerHTML = '';
+      const cData = gameQuestions[countryKey];
+      if (!cData || !cData.questions) return;
+
+      cData.questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.style.background = '#0e1526';
+        card.style.border = '1px solid rgba(255,255,255,0.1)';
+        card.style.borderRadius = '10px';
+        card.style.padding = '14px';
+        card.style.marginBottom = '12px';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <strong style="color:var(--gold);">Vraag #${idx + 1} (${cData.title})</strong>
+            <button class="header-btn" style="color:#ff4757; padding:4px 8px;" onclick="deleteQ('${countryKey}', ${idx})">Verwijder</button>
+          </div>
+          <input type="text" class="form-input" style="margin-bottom:8px;" value="${q.question.replace(/"/g, '&quot;')}" onchange="editQText('${countryKey}', ${idx}, this.value)">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
+            <input type="text" class="form-input" value="${q.options.A ? q.options.A.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'A', this.value)" placeholder="Optie A">
+            <input type="text" class="form-input" value="${q.options.B ? q.options.B.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'B', this.value)" placeholder="Optie B">
+            <input type="text" class="form-input" value="${q.options.C ? q.options.C.replace(/"/g, '&quot;') : ''}" onchange="editQOpt('${countryKey}', ${idx}, 'C', this.value)" placeholder="Optie C">
+          </div>
+          <div style="display:flex; gap:10px;">
+            <select class="form-select" style="max-width:90px;" onchange="editQCorrect('${countryKey}', ${idx}, this.value)">
+              <option value="A" ${q.correct === 'A' ? 'selected' : ''}>A</option>
+              <option value="B" ${q.correct === 'B' ? 'selected' : ''}>B</option>
+              <option value="C" ${q.correct === 'C' ? 'selected' : ''}>C</option>
+            </select>
+            <input type="text" class="form-input" value="${q.explanation ? q.explanation.replace(/"/g, '&quot;') : ''}" onchange="editQExpl('${countryKey}', ${idx}, this.value)" placeholder="Toelichting...">
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.editQText = (c, i, v) => gameQuestions[c].questions[i].question = v;
+    window.editQOpt = (c, i, o, v) => gameQuestions[c].questions[i].options[o] = v;
+    window.editQCorrect = (c, i, v) => gameQuestions[c].questions[i].correct = v;
+    window.editQExpl = (c, i, v) => gameQuestions[c].questions[i].explanation = v;
+    window.deleteQ = (c, i) => { gameQuestions[c].questions.splice(i, 1); renderEditorQuestions(c); };
+
+    // ==========================================
+    // INITIALIZATION & EVENT HANDLERS
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadActiveQuestions();
+      initAvatarPicker();
+
+      // Check URL parameters (e.g. ?role=player or ?pin=1234)
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialRole = urlParams.get('role') || 'host';
+      const initialPin = urlParams.get('pin');
+      if (initialPin) document.getElementById('player-pin-input').value = initialPin;
+
+      switchRole(initialRole);
+
+      // Role button clicks
+      document.getElementById('role-host-btn').onclick = () => switchRole('host');
+      document.getElementById('role-player-btn').onclick = () => switchRole('player');
+
+      // Item Guide modal
+      document.getElementById('open-item-guide-btn').onclick = () => document.getElementById('item-guide-modal').classList.add('active');
+      document.getElementById('close-item-guide-btn').onclick = () => document.getElementById('item-guide-modal').classList.remove('active');
+      document.getElementById('guide-understood-btn').onclick = () => document.getElementById('item-guide-modal').classList.remove('active');
+
+      // Audio toggle
+      document.getElementById('audio-toggle-btn').onclick = () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-status').innerText = soundEnabled ? 'Aan' : 'Uit';
+        document.getElementById('audio-toggle-btn').querySelector('i').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+      };
+
+      // Fullscreen
+      document.getElementById('fullscreen-btn').onclick = () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen().catch(()=>{});
+      };
+
+      // Restart
+      document.getElementById('restart-game-btn').onclick = () => {
+        if (confirm('Spel opnieuw instellen?')) location.reload();
+      };
+      document.getElementById('podium-rematch-btn').onclick = () => location.reload();
+
+      // Host start button
+      document.getElementById('start-grandprix-host-btn').onclick = startHostGrandPrix;
+      document.getElementById('add-bots-btn').onclick = addBots;
+
+      // Student join button
+      document.getElementById('player-join-btn').onclick = joinAsPlayer;
+
+      setupQuestionsEditor();
+    });
+  </script>
 </body>
 </html>
