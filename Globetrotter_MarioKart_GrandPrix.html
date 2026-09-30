@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -2065,12 +2065,19 @@ const QUESTIONS = {
       botInterval: null
     };
 
+    const QUESTIONS_VERSION = 'v2_shuffled';
     let gameQuestions = {};
     function loadActiveQuestions() {
       try {
+        const savedVer = localStorage.getItem('CIOS_QUESTIONS_VER');
         const saved = localStorage.getItem('CIOS_QUESTIONS_DATA');
-        if (saved) gameQuestions = JSON.parse(saved);
-        else if (typeof QUESTIONS !== 'undefined') gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
+        if (saved && savedVer === QUESTIONS_VERSION) {
+          gameQuestions = JSON.parse(saved);
+        } else {
+          localStorage.removeItem('CIOS_QUESTIONS_DATA');
+          localStorage.setItem('CIOS_QUESTIONS_VER', QUESTIONS_VERSION);
+          if (typeof QUESTIONS !== 'undefined') gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
+        }
       } catch (e) {
         if (typeof QUESTIONS !== 'undefined') gameQuestions = JSON.parse(JSON.stringify(QUESTIONS));
       }
@@ -3155,7 +3162,7 @@ const QUESTIONS = {
       rawOptions.forEach((opt, idx) => {
         const assignedLetter = letters[idx];
         roundOptions[assignedLetter] = opt.text;
-        if (opt.text === correctText) {
+        if (opt.orig === q.correct) {
           currentRoundCorrect = assignedLetter;
         }
       });
@@ -3167,6 +3174,7 @@ const QUESTIONS = {
         if (roundOptions[l]) {
           const btn = document.createElement('button');
           btn.className = 'opt-live-btn';
+          btn.dataset.letter = l;
           btn.innerHTML = `<strong style="color:var(--gold); font-size:1.1rem; width:28px;">${l}</strong> <span>${roundOptions[l]}</span>`;
           btn.onclick = () => handleStudentAnswer(l, currentRoundCorrect);
           grid.appendChild(btn);
@@ -3187,7 +3195,7 @@ const QUESTIONS = {
 
         // Visual check
         buttons.forEach(b => {
-          if (b.innerText.trim().startsWith(selectedLetter)) b.classList.add('correct');
+          if (b.dataset.letter === selectedLetter) b.classList.add('correct');
         });
 
         // Update Phone HUD
@@ -3221,8 +3229,8 @@ const QUESTIONS = {
         playSound('slip');
 
         buttons.forEach(b => {
-          if (b.innerText.trim().startsWith(selectedLetter)) b.classList.add('wrong');
-          if (b.innerText.trim().startsWith(correctLetter)) b.classList.add('correct');
+          if (b.dataset.letter === selectedLetter) b.classList.add('wrong');
+          if (b.dataset.letter === correctLetter) b.classList.add('correct');
         });
 
         document.getElementById('player-slip-penalty').style.display = 'block';
@@ -3461,7 +3469,7 @@ const QUESTIONS = {
         btn.disabled = true;
         btn.style.opacity = '0.3';
         const buttons = Array.from(document.querySelectorAll('#player-options-grid button'));
-        const wrongButtons = buttons.filter(b => !b.innerText.trim().startsWith(currentRoundCorrect));
+        const wrongButtons = buttons.filter(b => b.dataset.letter !== currentRoundCorrect);
         if (wrongButtons.length > 0) {
           const toDisable = wrongButtons[Math.floor(Math.random() * wrongButtons.length)];
           toDisable.disabled = true;
